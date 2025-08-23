@@ -1,13 +1,16 @@
     package edu.uniquindio.stayhub.api.model;
 
-    import java.time.LocalDateTime;
-
     import jakarta.persistence.*;
+    import lombok.Getter;
+    import lombok.Setter;
+
+    import java.time.LocalDateTime;
 
     @Entity
     @Table(name = "password_reset_tokens", indexes = {
             @Index(name = "idx_token", columnList = "token")
     })
+    @Getter @Setter
     public class PasswordResetToken {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +25,7 @@
 
         @Column(nullable = false)
         private LocalDateTime expiryDate;
+
+        @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+        private boolean used;
     }

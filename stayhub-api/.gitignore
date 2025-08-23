@@ -3,6 +3,7 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.log
 
 ### STS ###
 .apt_generated
@@ -14,10 +15,11 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
+
 
 ### NetBeans ###
 /nbproject/private/
@@ -31,3 +33,5 @@ build/
 
 ### VS Code ###
 .vscode/
+src/main/resources/application.properties
+src/main/resources/application.yml

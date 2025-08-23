@@ -1,16 +1,17 @@
 package edu.uniquindio.stayhub.api.dto;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.FetchType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.List;
 
+@Getter @Setter
 public class UpdateProfileDTO {
     @NotNull(message = "El nombre es obligatorio")
     private String name;

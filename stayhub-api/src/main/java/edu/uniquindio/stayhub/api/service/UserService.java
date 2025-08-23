@@ -7,13 +7,12 @@ import edu.uniquindio.stayhub.api.exception.UserNotFoundException;
 import edu.uniquindio.stayhub.api.model.HostProfile;
 import edu.uniquindio.stayhub.api.model.PasswordResetToken;
 import edu.uniquindio.stayhub.api.model.Role;
+import edu.uniquindio.stayhub.api.model.User;
+import edu.uniquindio.stayhub.api.repository.PasswordResetTokenRepository;
+import edu.uniquindio.stayhub.api.repository.UserRepository;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import edu.uniquindio.stayhub.api.model.User;
-import edu.uniquindio.stayhub.api.repository.UserRepository;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
@@ -22,14 +21,15 @@ import java.time.LocalDateTime;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordResetTokenRepository passwordResetTokenRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public User saveUser(@Valid User user) {
         if (user.getRole() == Role.HOST && user.getHostProfile() == null) {
@@ -41,7 +41,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateProfile(Long userId, @Valid UpdateProfileDTO updateUser) {
+    public User updateProfile(Long userId, @Valid UpdateProfileDTO updatedUser) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
         user.setName(updatedUser.getName());
         user.setPhoneNumber(updatedUser.getPhoneNumber());

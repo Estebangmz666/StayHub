@@ -2,6 +2,7 @@ package edu.uniquindio.stayhub.api.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import org.hibernate.validator.constraints.URL;
@@ -54,7 +55,7 @@ public class User {
     private boolean isDeleted;
 
     @URL(message = "Debe ser una URL válida")
-    @Column(nullable = true)
+    @Column
     private String profilePicture;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -62,11 +63,14 @@ public class User {
     private HostProfile hostProfile;
 
     @OneToMany(mappedBy = "host")
+    @Builder.Default
     private List<Accommodation> accommodations = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<Reservation> reservations = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
 }

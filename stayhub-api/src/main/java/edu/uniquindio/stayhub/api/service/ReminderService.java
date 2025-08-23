@@ -1,7 +1,8 @@
 package edu.uniquindio.stayhub.api.service;
 
+import edu.uniquindio.stayhub.api.model.Reservation;
 import edu.uniquindio.stayhub.api.repository.ReservationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,14 +15,16 @@ import java.util.List;
 @Service
 public class ReminderService {
 
-    @Autowired
-    private ReservationRepository reservationRepository;
+    private final ReservationRepository reservationRepository;
+    private final JavaMailSender mailSender;
 
-    @Autowired
-    private JavaMailSender mailSender;
+    public ReminderService(ReservationRepository reservationRepository, JavaMailSender mailSender) {
+        this.reservationRepository = reservationRepository;
+        this.mailSender = mailSender;
+    }
 
     @Scheduled(cron = "0 0 8 * * *")
-    public void sendCheckInReminders(){
+    public void sendCheckInReminders() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         List<Reservation> upcoming = reservationRepository.findByCheckInDate(tomorrow);
         for (Reservation reservation : upcoming) {
@@ -35,6 +38,7 @@ public class ReminderService {
                             ", un huésped llegará mañana a su alojamiento " + reservation.getAccommodation().getTitle() + ".");
         }
     }
+
     private void sendEmail(String to, String subject, String body){
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -45,5 +49,10 @@ public class ReminderService {
         } catch (MailException e) {
             System.err.println("Error enviando correo a " + to + ": " + e.getMessage());
         }
+    }
+
+    @PostConstruct
+    public void testRemindersOnStartup() {
+        sendCheckInReminders();
     }
 }
