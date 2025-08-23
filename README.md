@@ -1,5 +1,3 @@
-# StayHub
-
 <img src="assets/logo-git.png" alt="StayHub Logo" width="150" height="50">  
 A platform to manage accommodations, reservations, and reviews with efficiency and reliability.
 
@@ -105,14 +103,16 @@ Contributions are welcome. To contribute:
 4. Push to the branch (`git push origin feature/awesome-feature`).
 5. Open a pull request.
 
+## Contact
+
+[![Email](https://img.shields.io/badge/Email-estebangumy05@gmail.com-lightgrey?style=for-the-badge)](mailto:estebangumy05@gmail.com)  
+[![GitHub](https://img.shields.io/badge/GitHub-@estebangmz666-black?style=for-the-badge&logo=github)](https://github.com/estebangmz666)  
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-znotkayn-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/znotkayn)
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contact
-
-For questions or feedback, please use [GitHub Issues](https://github.com/Estebangmz666/StayHub/issues) or email [your-email@example.com](mailto:your-email@example.com).
-
 ---
 
-StayHub: Where comfort meets technology.
+StayHub: The smart way to book, host and manage stays.
