@@ -28,5 +28,6 @@ public class UpdateProfileDTO {
     private String description;
 
     @Valid
+    @URL(message = "Cada documento debe tener una url válida")
     private List<String> legalDocuments;
 }
