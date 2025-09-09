@@ -1,4 +1,4 @@
-package edu.uniquindio.stayhub.api.dto;
+package edu.uniquindio.stayhub.api.dto.comment;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

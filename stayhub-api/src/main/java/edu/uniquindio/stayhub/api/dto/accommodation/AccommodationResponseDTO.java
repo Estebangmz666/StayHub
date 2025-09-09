@@ -1,4 +1,4 @@
-package edu.uniquindio.stayhub.api.dto;
+package edu.uniquindio.stayhub.api.dto.accommodation;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package edu.uniquindio.stayhub.api.dto;
+package edu.uniquindio.stayhub.api.dto.reservation;
 
 import edu.uniquindio.stayhub.api.model.ReservationStatus;
 import jakarta.validation.constraints.Future;

@@ -1,16 +1,16 @@
 package edu.uniquindio.stayhub.api.service;
 
-import edu.uniquindio.stayhub.api.model.Reservation;
-import edu.uniquindio.stayhub.api.repository.ReservationRepository;
-import jakarta.annotation.PostConstruct;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.List;
+import edu.uniquindio.stayhub.api.model.Reservation;
+import edu.uniquindio.stayhub.api.repository.ReservationRepository;
 
 @Service
 public class ReminderService {
@@ -49,10 +49,5 @@ public class ReminderService {
         } catch (MailException e) {
             System.err.println("Error enviando correo a " + to + ": " + e.getMessage());
         }
-    }
-
-    @PostConstruct
-    public void testRemindersOnStartup() {
-        sendCheckInReminders();
     }
 }

@@ -1,28 +1,22 @@
 package edu.uniquindio.stayhub.api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "accommodations", indexes = {
         @Index(name = "idx_host_id", columnList = "host_id"),
-        @Index(name = "idx_location", columnList = "latitude, longitude")
+        @Index(name = "idx_location", columnList = "latitude, longitude"),
+        @Index(name = "idx_city", columnList = "city"),
+        @Index(name = "idx_deleted", columnList = "isDeleted")
 })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Accommodation {
@@ -46,6 +40,10 @@ public class Accommodation {
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
     private Integer capacity;
 
+    @Column
+    @URL(message = "La imagen principal debe ser una URL válida")
+    private String mainImage;
+
     @Column(nullable = false)
     @NotNull(message = "La longitud es obligatoria")
     private Double longitude;
@@ -53,6 +51,16 @@ public class Accommodation {
     @Column(nullable = false)
     @NotNull(message = "La latitud es obligatoria")
     private Double latitude; //Mapbox Stuff xd
+
+    @Column(nullable = false)
+    @NotBlank(message = "La ubicación es obligatoria")
+    @Size(max = 200, message = "La ubicación no puede exceder 200 caracteres")
+    private String locationDescription;
+
+    @Column(nullable = false)
+    @NotBlank(message = "La ciudad es obligatoria")
+    @Size(max = 50, message = "La ciudad no puede exceder 50 caracteres")
+    private String city;
 
     @Column(nullable = false)
     @NotNull(message = "El precio por noche es obligatorio")
@@ -68,6 +76,15 @@ public class Accommodation {
     @ManyToOne
     @JoinColumn(name = "host_id", nullable = false)
     private User host;
+
+    @ManyToMany
+    @JoinTable(
+            name = "accommodation_amenities",
+            joinColumns = @JoinColumn(name = "accommodation_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    @Builder.Default
+    private Set<Amenity> amenities = new HashSet<>();
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isDeleted;

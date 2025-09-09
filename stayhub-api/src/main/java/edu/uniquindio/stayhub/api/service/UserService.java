@@ -1,6 +1,9 @@
 package edu.uniquindio.stayhub.api.service;
 
-import edu.uniquindio.stayhub.api.dto.UpdateProfileDTO;
+import edu.uniquindio.stayhub.api.dto.auth.TokenResponseDTO;
+import edu.uniquindio.stayhub.api.dto.user.UpdateProfileDTO;
+import edu.uniquindio.stayhub.api.dto.user.UserLoginDTO;
+import edu.uniquindio.stayhub.api.dto.user.UserRegistrationDTO;
 import edu.uniquindio.stayhub.api.exception.InvalidPasswordException;
 import edu.uniquindio.stayhub.api.exception.InvalidTokenException;
 import edu.uniquindio.stayhub.api.exception.UserNotFoundException;
@@ -87,5 +90,38 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         passwordResetTokenRepository.delete(resetToken);
+    }
+
+    public TokenResponseDTO registerUser(UserRegistrationDTO userDTO) {
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalStateException("El correo electrónico ya está en uso");
+        }
+        User user = new User();
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setName(userDTO.getName());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setBirthDate(userDTO.getBirthDate());
+        user.setRole(userDTO.getRole());
+        if (user.getRole() == Role.HOST) {
+            user.setHostProfile(new HostProfile());
+        }
+        user = saveUser(user);
+        TokenResponseDTO tokenResponse = new TokenResponseDTO();
+        tokenResponse.setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ" + user.getEmail() + "\",\"exp\":1725898000}.abc");
+
+        return tokenResponse;
+    }
+
+    public TokenResponseDTO loginUser(UserLoginDTO loginDTO) {
+        User user = userRepository.findByEmail(loginDTO.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Correo electrónico o contraseña incorrectos");
+        }
+        TokenResponseDTO tokenResponse = new TokenResponseDTO();
+        tokenResponse.setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ" + user.getEmail() + "\",\"exp\":1725898000}.abc");
+
+        return tokenResponse;
     }
 }

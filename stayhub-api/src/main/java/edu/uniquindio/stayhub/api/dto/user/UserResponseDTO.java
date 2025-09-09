@@ -1,4 +1,4 @@
-package edu.uniquindio.stayhub.api.dto;
+package edu.uniquindio.stayhub.api.dto.user;
 
 import edu.uniquindio.stayhub.api.model.Role;
 import lombok.Getter;

@@ -1,0 +1,438 @@
+openapi: 3.0.3
+info:
+  title: StayHub API
+  description: REST API for the StayHub accommodation booking platform
+  version: 1.0.0
+  contact:
+    name: Your Name
+    email: your.email@example.com
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Version 1 of the API in local development
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        role:
+          type: string
+          enum: [USER, HOST]
+        name:
+          type: string
+        phoneNumber:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        isDeleted:
+          type: boolean
+        profilePicture:
+          type: string
+          format: uri
+        hostProfileId:
+          type: integer
+          format: int64
+      required:
+        - email
+        - password
+        - role
+        - name
+        - phoneNumber
+        - birthDate
+    Accommodation:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        capacity:
+          type: integer
+        mainImage:
+          type: string
+          format: uri
+        longitude:
+          type: number
+        latitude:
+          type: number
+        locationDescription:
+          type: string
+        city:
+          type: string
+        pricePerNight:
+          type: number
+          format: double
+        isDeleted:
+          type: boolean
+        hostId:
+          type: integer
+          format: int64
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+      required:
+        - title
+        - description
+        - capacity
+        - longitude
+        - latitude
+        - locationDescription
+        - city
+        - pricePerNight
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        accommodationId:
+          type: integer
+          format: int64
+        checkInDate:
+          type: string
+          format: date
+        checkOutDate:
+          type: string
+          format: date
+        numberOfGuests:
+          type: integer
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED]
+        isDeleted:
+          type: boolean
+      required:
+        - userId
+        - accommodationId
+        - checkInDate
+        - checkOutDate
+        - numberOfGuests
+        - status
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        accommodationId:
+          type: integer
+          format: int64
+        text:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        createdAt:
+          type: string
+          format: date-time
+        isDeleted:
+          type: boolean
+      required:
+        - userId
+        - accommodationId
+        - text
+        - rating
+        - createdAt
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          format: int32
+
+paths:
+  /auth/register:
+    post:
+      summary: Registers a new user
+      description: Creates a new user (guest or host) with the provided data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid data (e.g., duplicate email, invalid format)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
+  /auth/login:
+    post:
+      summary: Logs in a user
+      description: Authenticates a user and returns a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /accommodations:
+    get:
+      summary: Searches for available accommodations
+      description: Returns a list of accommodations based on filters (city, dates, price, guests)
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: checkInDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: checkOutDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: minGuests
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: maxGuests
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: 0
+      responses:
+        '200':
+          description: List of accommodations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Accommodation'
+        '400':
+          description: Invalid filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
+    post:
+      summary: Creates a new accommodation
+      description: Allows a host to register a new accommodation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Accommodation'
+      responses:
+        '201':
+          description: Accommodation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accommodation'
+        '401':
+          description: Unauthorized (requires JWT token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+  /accommodations/{accommodationId}:
+    get:
+      summary: Retrieves details of an accommodation
+      description: Returns the details of a specific accommodation
+      parameters:
+        - name: accommodationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Accommodation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accommodation'
+        '404':
+          description: Accommodation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+    delete:
+      summary: Deletes an accommodation
+      description: Allows a host to delete an accommodation (soft delete)
+      parameters:
+        - name: accommodationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Accommodation marked as deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: integer
+                    format: int64
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Accommodation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+  /reservations:
+    post:
+      summary: Creates a new reservation
+      description: Allows a guest to book an accommodation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '201':
+          description: Reservation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          description: Invalid data (e.g., invalid dates)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+  /comments:
+    post:
+      summary: Creates a new comment
+      description: Allows a guest to leave a comment about an accommodation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '201':
+          description: Comment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid data (e.g., rating out of range)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []

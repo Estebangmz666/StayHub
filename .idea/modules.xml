@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/StayHub.iml" filepath="$PROJECT_DIR$/.idea/StayHub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stayhub-api/stayhub-api.iml" filepath="$PROJECT_DIR$/stayhub-api/stayhub-api.iml" />
     </modules>
   </component>
 </project>

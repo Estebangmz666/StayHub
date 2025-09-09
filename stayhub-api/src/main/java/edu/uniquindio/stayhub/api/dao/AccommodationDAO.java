@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class AccomodationDAO {
+public class AccommodationDAO {
     private final AccommodationRepository accommodationRepository;
 
     public AccommodationDAO(AccommodationRepository accommodationRepository) {

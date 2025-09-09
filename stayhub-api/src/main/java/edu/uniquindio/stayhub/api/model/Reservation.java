@@ -11,10 +11,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -25,6 +22,7 @@ import java.time.LocalDate;
         @Index(name = "idx_accommodation_id", columnList = "accommodation_id"),
         @Index(name = "idx_check_in_date", columnList = "check_in_date")
 })
+@AssertTrue(message = "La fecha de check-out debe ser posterior al check-in")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Reservation {
     @Id
@@ -60,4 +58,9 @@ public class Reservation {
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isDeleted;
+
+    public boolean isCheckOutAfterCheckIn() {
+        if (checkInDate == null || checkOutDate == null) return true;
+        return checkOutDate.isAfter(checkInDate);
+    }
 }
