@@ -1,4 +1,4 @@
-# StayHub Coding Standards
+# StayHub - Coding Standards
 
 This document outlines the coding standards and naming conventions for the StayHub application, ensuring consistency, readability, and maintainability. These standards align with Java Code Conventions (Oracle), Spring Boot best practices, and the bilingual nature of the project (English code, Spanish user-facing messages).
 
@@ -90,7 +90,7 @@ This document outlines the coding standards and naming conventions for the StayH
 - **Rule**: Throw specific exceptions with clear messages.
 - **Example**:
   ```java
-  throw new IllegalStateException("Email already exists");
+  throw new IllegalStateException("El email ya existe");
   ```
 
 ## 2.5 Versioning and Consistency
@@ -154,3 +154,64 @@ public class UserDAO {
 - **Checkstyle**: Add a `checkstyle.xml` file with Google Java Style rules.
 - **Review**: Apply these standards to existing repositories, DAOs, and mappers.
 - **Documentation**: Maintain this file in the project root or `docs/` folder.  
+
+
+## 5. Angular Coding Standards
+
+### 5.1 Naming Conventions
+- **Components**: Use `PascalCase` and suffix with `Component` (e.g., `BookingFormComponent`).
+- **Services**: Use `PascalCase` and suffix with `Service` (e.g., `UserService`).
+- **Modules**: Use `PascalCase` and suffix with `Module` (e.g., `AccommodationModule`).
+- **Variables and Methods**: Use `camelCase`.
+
+### 5.2 Folder Structure
+- Group by feature (e.g., `/accommodation`, `/reservation`).
+- Each feature folder contains `components`, `services`, `models`, and optionally `guards`.
+
+### 5.3 HTML & CSS
+- Use semantic HTML tags.
+- Use Angular bindings (`[value]`, `(click)`) instead of direct DOM manipulation.
+- Use SCSS with BEM naming convention.
+
+### 5.4 Internationalization
+- Use Spanish for user-facing messages.
+- Store messages in `i18n` files or constants.
+
+---
+
+## 6. Git Commit Standards
+
+### 6.1 Commit Message Format
+Use [Conventional Commits](https://www.conventionalcommits.org):
+- `feat:` for new features
+- `fix:` for bug fixes
+- `docs:` for documentation changes
+- `style:` for formatting (no code change)
+- `refactor:` for code refactoring
+- `test:` for adding or updating tests
+- `chore:` for maintenance tasks
+
+### 6.2 Examples
+- `feat: add reservation cancellation feature`
+- `fix: correct date validation in booking form`
+
+---
+
+## 7. Testing Guidelines
+
+### 7.1 Backend (Spring Boot)
+- Use JUnit 5 and Mockito.
+- Cover services and DAOs.
+- Use `@WebMvcTest` for controller tests.
+- Validate Spanish messages in exceptions.
+
+### 7.2 Frontend (Angular)
+- Use Jasmine and Karma.
+- Write unit tests for components and services.
+- Use `HttpTestingController` for API mocks.
+
+### 7.3 Coverage Goals
+- Aim for 80%+ coverage on critical modules.
+- Use tools like JaCoCo (Java) and Istanbul (Angular).
+
+---

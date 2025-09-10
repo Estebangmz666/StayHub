@@ -1,7 +1,7 @@
-# Use Cases – StayHub
+# StayHub - Use Cases
 
 ## Table of Contents
-- [Guest Role](#guest-role)
+- Guest Role
   - [UC-001: Register User](#uc-001-register-user)
   - [UC-002: Log In](#uc-002-log-in)
   - [UC-003: Change Password](#uc-003-change-password)
@@ -13,7 +13,7 @@
   - [UC-009: Leave Comment and Rating](#uc-009-leave-comment-and-rating)
   - [UC-010: Receive Reminders](#uc-010-receive-reminders)
 
-- [Host Role](#host-role)
+- Host Role
   - [UC-011: Register Host](#uc-011-register-host)
   - [UC-012: Log In](#uc-012-log-in)
   - [UC-013: View Accommodations](#uc-013-view-accommodations)
@@ -25,7 +25,7 @@
   - [UC-019: Respond to Comments](#uc-019-respond-to-comments)
   - [UC-020: Receive Notifications](#uc-020-receive-notifications)
 
-- [System Role](#system-role)
+- System Role
   - [UC-021: Validate Unique Email](#uc-021-validate-unique-email)
   - [UC-022: Encrypt Password](#uc-022-encrypt-password)
   - [UC-023: Validate Completed Stay for Comments](#uc-023-validate-completed-stay-for-comments)
@@ -44,7 +44,7 @@ Use cases are numbered sequentially within each role (Guest: UC-001 to UC-010, H
 - **Soft Delete**: A mechanism to mark records as "deleted" in the database without physically removing them, preserving historical data.
 - **Mapbox**: A third-party service used to display interactive maps for accommodation locations.
 
-## 1. Guest Role
+## 1. Guest Role ()
 
 ### UC-001: Register User
 - **Actor**: Guest
@@ -52,7 +52,7 @@ Use cases are numbered sequentially within each role (Guest: UC-001 to UC-010, H
 - **Preconditions**: The guest is not registered in the system.
 - **Basic Flow**:
   1. The guest navigates to the registration page.
-  2. The guest enters their name, email, password (minimum 8 characters, uppercase, numbers), phone, role, and birth date.
+  2. The guest enters their name, email, password (minimum 8 characters, uppercase, numbers), phone, role, and birthdate.
   3. The system validates the email uniqueness (includes UC-021: Validate Unique Email).
   4. The system encrypts the password (includes UC-022: Encrypt Password).
   5. The system creates the account and assigns the "Guest" role.
@@ -125,10 +125,10 @@ Use cases are numbered sequentially within each role (Guest: UC-001 to UC-010, H
 - **Exceptions**: 
   - If query fails, show "Error en la búsqueda".
 
-### UC-005: View Accomodation Details
+### UC-005: View Accommodation Details
 - **Actor**: Guest
 - **Description**: Allows a guest to view the complete details of an accommodation (gallery, calendar, comments, etc.) to evaluate if it meets their expectations.
-- **Preconditions**: The guest is on the search results page or has a direct link to an accommodation.
+- **Preconditions**: The guest is on the search results page or has a direct link to accommodation.
 - **Basic Flow**:
   1. The guest clicks on an accommodation card from the search results or accesses via URL.
   2. The system fetches the accommodation details (images, description, location, calendar, comments, average rating).
@@ -143,7 +143,7 @@ Use cases are numbered sequentially within each role (Guest: UC-001 to UC-010, H
 ### UC-006: Make Reservation
 - **Actor**: Guest
 - **Description**: Allows a guest to make a reservation by selecting dates and confirming details, to secure accommodation for their trip.
-- **Preconditions**: The guest is authenticated and on an accommodation details page.
+- **Preconditions**: The guest is authenticated and on accommodation details page.
 - **Basic Flow**:
   1. The guest selects available dates on the calendar and specifies the number of guests (within maximum capacity).
   2. The system validates the dates (available, not past) and guest count.
@@ -292,7 +292,7 @@ Use cases are numbered sequentially within each role (Guest: UC-001 to UC-010, H
 
 ### UC-014: Create Accommodation
 - **Actor**: Host
-- **Description**: Allows a host to create a new accommodation with details like name, location, price, photos, description, and availability to offer it to potential guests.
+- **Description**: Allows a host to create new accommodation with details like name, location, price, photos, description, and availability to offer it to potential guests.
 - **Preconditions**: The host is authenticated and on the accommodation creation page.
 - **Basic Flow**:
   1. The host enters accommodation details (title, description, city, address, latitude/longitude, price per night, capacity, services).
@@ -384,23 +384,23 @@ Use cases are numbered sequentially within each role (Guest: UC-001 to UC-010, H
 - **Exceptions**:
   - If calculation fails, show "Error al calcular las métricas, intenta de nuevo" and log the error for debugging.
 
-### UC-019: Responder a Comentarios
-- **Actor**: Anfitrión
-- **Descripción**: Permite a un anfitrión responder a los comentarios de los huéspedes para mantener una buena reputación y responder a retroalimentación.
-- **Precondiciones**: El anfitrión está autenticado y es propietario del alojamiento.
-- **Flujo Básico**:
-  1. El anfitrión accede a la página de detalles del alojamiento.
-  2. El anfitrión selecciona un comentario de un huésped y elige responder.
-  3. El anfitrión ingresa un texto de respuesta (máximo 500 caracteres).
-  4. El sistema guarda la respuesta y la muestra junto al comentario.
-- **Flujos Alternativos**:
-  - A1: Comentario no encontrado
-    - Si el comentario no existe, muestra "El comentario no existe".
-  - A2: Texto de respuesta demasiado largo
-    - En el paso 3, si la respuesta excede los 500 caracteres, muestra "La respuesta excede el límite de 500 caracteres".
-- **Postcondiciones**: La respuesta se guarda y se muestra en la página del alojamiento.
-- **Excepciones**:
-  - Si no se puede guardar la respuesta, muestra "Error al guardar la respuesta, intenta de nuevo" y registra el error para depuración.
+### UC-019: Respond To Comments
+- **Actor**: Host
+- **Description**: Allows a host to respond to guest comments to maintain a good reputation and respond to feedback.
+- **Preconditions**: The host is authenticated and owns the accommodation.
+- **Basic Flow**:
+  1. The host accesses the accommodation details page.
+  2. The host selects a guest comment and chooses to respond.
+  3. The host enters a response text (maximum 500 characters).
+  4. The system saves the answer and displays it next to the comment.
+- **Alternative Flows**:
+  - A1: Comment not found
+    - If the comment does not exist, it displays "Comment does not exist."
+  - A2: Response text too long
+    - In step 3, if the answer exceeds 500 characters, it displays "Answer exceeds the 500-character limit."
+- **Postconditions**: The response is saved and displayed on the accommodation page.
+- **Exceptions**:
+  - If the response cannot be saved, it displays "Error saving response, please try again" and logs the error for debugging.
 
 ### UC-020: Receive Notifications
 - **Actor**: Host
@@ -497,7 +497,7 @@ Use cases are numbered sequentially within each role (Guest: UC-001 to UC-010, H
 ### UC-023: Validate Completed Stay for Comments
 - **Actor**: System
 - **Description**: Validates that only users who completed a stay can leave a comment to ensure the authenticity of reviews.
-- **Preconditions**: A user attempts to leave a comment on an accommodation.
+- **Preconditions**: A user attempts to leave a comment on accommodation.
 - **Basic Flow**:
   1. The system receives a comment submission associated with a reservation.
   2. The system checks the reservation's status and check-out date.

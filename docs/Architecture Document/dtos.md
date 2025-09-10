@@ -1,4 +1,4 @@
-# StayHub API DTOs Documentation
+# StayHub - DTOs Documentation
 
 This document outlines the Data Transfer Objects (DTOs) used in the StayHub application to facilitate data exchange between layers. DTOs are organized under the `edu.uniquindio.stayhub.api.dto` package with sub-packages per entity or functionality.
 

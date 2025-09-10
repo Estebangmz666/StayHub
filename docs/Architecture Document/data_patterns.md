@@ -1,4 +1,4 @@
-# StayHub Data Access Patterns Documentation
+# StayHub - Data Access Patterns Documentation
 
 This document defines the **Repository**, **Data Access Object (DAO)**, and **Data Mapper** patterns implemented in the StayHub application to manage data persistence and mapping. These patterns are integral to the **Data Access Layer** within the Extended MVC architecture, utilizing **Spring Boot, JPA/Hibernate, and MariaDB**.
 

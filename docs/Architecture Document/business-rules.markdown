@@ -1,4 +1,4 @@
-# Business Rules - StayHub
+# StayHub - Business Rules
 
 **Note**: The identifier "RN-XXX" is used for Business Rules (Reglas de Negocio) to maintain consistency with the Spanish documentation, where "RN" stands for "Regla de Negocio" (Business Rule).
 
@@ -19,7 +19,7 @@
 - **RN-009**: When no results are found for the search criteria, the system displays "No accommodations found for the selected criteria."
 - **RN-010**: City search must include predictive functionality (e.g., typing "Bog" suggests "Bogotá D.C.").
 - **RN-011**: Invalid search filters (past dates or negative price range) trigger the message "Please enter valid filters (future dates and valid price range)."
-- **RN-012**: When attempting to access an accommodation marked as "deleted," the system displays "The accommodation is not available."
+- **RN-012**: When attempting to access accommodation marked as "deleted," the system displays "The accommodation is not available."
 
 ### Reservations
 - **RN-013**: A reservation must include at least one valid check-in and check-out date.
@@ -66,7 +66,7 @@
 - **RN-044**: Accommodations are created with the "active" status by default.
 - **RN-045**: Only the accommodation owner can edit it. If another host attempts to edit it, the system displays "You do not have permission to edit this accommodation."
 - **RN-046**: If an attempt is made to edit a non-existent accommodation, the system displays "The accommodation does not exist."
-- **RN-047**: An accommodation can only be deleted if it has no future reservations. If it has future reservations, the system displays "An accommodation with future reservations cannot be deleted."
+- **RN-047**: An accommodation can only be deleted if it has no future reservations. If it has future reservations, the system displays "Accommodation with future reservations cannot be deleted."
 - **RN-048**: Accommodation deletion is a "soft delete" - it is marked with "deleted" status in the database without physical removal.
 - **RN-049**: If a host has no registered accommodations, the system displays "You have no registered accommodations."
 - **RN-083**: Accommodations marked as "deleted" do not appear in public searches or user views.
@@ -81,7 +81,7 @@
 ### Metrics and Analysis
 - **RN-055**: Hosts can view basic metrics per accommodation: number of reservations and average rating.
 - **RN-056**: Metrics can be filtered by date range.
-- **RN-057**: If no metrics are available for an accommodation in the selected period, the system displays "No metrics available for this accommodation in the selected range."
+- **RN-057**: If no metrics are available for accommodation in the selected period, the system displays "No metrics available for this accommodation in the selected range."
 
 ### Communication
 - **RN-058**: Hosts can respond to guest comments.

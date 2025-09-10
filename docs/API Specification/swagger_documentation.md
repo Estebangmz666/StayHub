@@ -1,4 +1,4 @@
-# StayHub Swagger Documentation
+# StayHub - Swagger Documentation
 
 This document outlines the configuration and usage of Swagger for the StayHub application, utilizing `springdoc-openapi` to generate interactive API documentation. The Swagger UI is configured to be accessible at `/swagger-ui.html`, providing a user-friendly interface to explore and test the REST API endpoints.
 

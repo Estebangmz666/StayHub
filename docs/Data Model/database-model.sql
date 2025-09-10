@@ -1,3 +1,5 @@
+-- StayHub - Database Model
+
 -- Create Amenities Table
 CREATE TABLE amenities (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

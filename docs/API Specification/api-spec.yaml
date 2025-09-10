@@ -4,8 +4,8 @@ info:
   description: REST API for the StayHub accommodation booking platform
   version: 1.0.0
   contact:
-    name: Your Name
-    email: your.email@example.com
+    name: Esteban Gómez León
+    email: estebangumy05@gmail.com
 
 servers:
   - url: http://localhost:8080/api/v1

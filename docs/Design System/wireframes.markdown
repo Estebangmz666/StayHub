@@ -1,4 +1,4 @@
-# Wireframes - StayHub
+#  StayHub - Wireframes
 
 **Note**: This document describes low-fidelity wireframes for StayHub's **key pages**, focusing on layout and functionality without final visual details (e.g., colors, typography). The wireframes are based on the component system (component-system.md) using Atomic Design, aligning with the Business Rules (RN-XXX) and Non-Functional Requirements (RNF-XXX). The interface uses Spanish for user-facing elements (RNF-028), with documentation in English for technical consistency.
 
@@ -80,10 +80,3 @@ Low-fidelity wireframes outline the structure and user flow for StayHub's key pa
 - **Performance**: Images load in <5s with progressive loading (RNF-003).
 - **Accessibility**: Calendar and form support keyboard navigation and screen readers (RNF-039).
 - **User Flow**: Users view accommodation details, select dates via the calendar, fill the reservation form, and click "Reservar ahora" (UC-005, RN-017).
-
-## Implementation Notes
-- **Frontend (Angular)**: Use the component system (component-system.md) to implement wireframe elements as Angular components, ensuring consistency with the defined atoms, molecules, and organisms (RNF-037).
-- **Accessibility**: Apply WCAG 2.1 Level AA guidelines, including ARIA labels and sufficient contrast (RNF-039).
-- **Responsive Design**: Ensure layouts adapt to screen sizes from 320px to 1920px (RNF-018).
-- **Consistency**: Use Spanish for all user-facing text, following defined terminology and error messages (RNF-028, RN-001, RN-012).
-- **Tools**: Wireframes can be created using Draw.io or Balsamiq for visualization, with ASCII diagrams and descriptions sufficient for initial planning in this document.

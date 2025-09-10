@@ -1,4 +1,4 @@
-# Non-Functional Requirements - StayHub
+# StayHub - Non-Functional Requirements
 
 **Note**: The identifier "RNF-XXX" is used for Non-Functional Requirements to maintain consistency with the Spanish documentation, where "RNF" stands for "Requerimiento No Funcional" (Non-Functional Requirement). These requirements complement the Business Rules (RN-XXX) defined for StayHub.
 

@@ -23,8 +23,7 @@ import org.springframework.context.annotation.Configuration;
                 description = "REST API for managing accommodations, reservations, and user accounts in the StayHub platform",
                 contact = @Contact(
                         name = "StayHub Development Team",
-                        email = "estebangumy05@gmail.com",
-                        url = "https://stayhub.com"
+                        email = "estebangumy05@gmail.com"
                 ),
                 license = @License(
                         name = "MIT License",

@@ -1,4 +1,4 @@
-# StayHub Architecture Diagram and Justification
+# StayHub - Architecture Diagram and Justification
 
 **Note**: This document describes the architecture diagram for StayHub, a modern accommodation booking platform, and justifies the chosen architecture. The design follows a monolithic architecture with an Extended MVC pattern, incorporating a logical security layer to handle JWT, password encryption, and validations. It aligns with user stories (US-001 to US-020, HOST-001 to HOST-010), use cases (UC-001 to UC-025), business rules (RN-001 to RN-083), non-functional requirements (RNF-001 to RNF-039), component system (component-system.md), wireframes (wireframes.md), and mockups (mockups.md). The interface uses Spanish for user-facing elements (RNF-028), with documentation in English for technical consistency.
 

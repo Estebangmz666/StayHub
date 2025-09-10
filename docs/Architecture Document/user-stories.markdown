@@ -1,4 +1,4 @@
-# User Stories Backlog — StayHub
+# StayHub - User Stories Backlog
 
 ## User (Guest)
 
@@ -12,7 +12,7 @@
 
 **Acceptance Criteria:**
 1. Given: I am on the registration page  
-   When: I enter a name, valid email, secure password (min 8 chars, uppercase, numbers), phone, role, and birth date  
+   When: I enter a name, valid email, secure password (min 8 chars, uppercase, numbers), phone, role, and birthdate  
    Then: my account is created successfully, I receive confirmation, and I'm redirected to main page
 
 2. Given: I am on the registration page  
@@ -388,7 +388,7 @@
 **ID:** HOST-003  
 **Title:** Create New Accommodation  
 **As** a host  
-**I want** to create a new accommodation with details  
+**I want** to create new accommodation with details  
 **So that** I can offer it to potential guests  
 
 **Acceptance Criteria:**
