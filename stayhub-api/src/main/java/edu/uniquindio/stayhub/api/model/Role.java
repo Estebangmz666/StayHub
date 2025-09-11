@@ -1,5 +1,15 @@
-    package edu.uniquindio.stayhub.api.model;
+package edu.uniquindio.stayhub.api.model;
 
-    public enum Role {
-        USER, HOST
-    }
+/**
+ * Enum to define the different roles of a user within the application.
+ */
+public enum Role {
+    /**
+     * A user who can book accommodations.
+     */
+    GUEST,
+    /**
+     * A user who can list and manage their own accommodations.
+     */
+    HOST
+}

@@ -6,18 +6,49 @@ import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationUpdateDTO;
 import edu.uniquindio.stayhub.api.model.Accommodation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.MappingTarget;
 
-@Mapper
+/**
+ * Mapper interface for converting between Accommodation DTOs and entities.
+ * This interface uses MapStruct to automatically generate the implementation.
+ */
+@Mapper(componentModel = "spring")
 public interface AccommodationMapper {
-    AccommodationMapper INSTANCE = Mappers.getMapper(AccommodationMapper.class);
 
-    @Mapping(target = "host", ignore = true) // Handled by service layer
+    /**
+     * Converts an {@link AccommodationRequestDTO} to an {@link Accommodation} entity.
+     * <p>
+     * The following fields are ignored and will not be mapped automatically:
+     * <ul>
+     * <li>{@code id}</li>
+     * <li>{@code host}</li>
+     * <li>{@code amenities}</li>
+     * <li>{@code reservations}</li>
+     * <li>{@code comments}</li>
+     * <li>{@code deleted}</li>
+     * <li>{@code createdAt}</li>
+     * <li>{@code updatedAt}</li>
+     * </ul>
+     *
+     * @param dto The DTO containing the data to convert.
+     * @return A new {@link Accommodation} entity with the mapped data.
+     */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "host", ignore = true)
+    @Mapping(target = "amenities", ignore = true)
+    @Mapping(target = "reservations", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Accommodation toEntity(AccommodationRequestDTO dto);
 
-    @Mapping(target = "host", ignore = true)
-    Accommodation toEntity(AccommodationUpdateDTO dto);
-
+    /**
+     * Converts an {@link Accommodation} entity to an {@link AccommodationResponseDTO}.
+     *
+     * @param accommodation The entity containing the data to convert.
+     * @return A new {@link AccommodationResponseDTO} with the mapped data.
+     */
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "description", target = "description")
@@ -29,5 +60,33 @@ public interface AccommodationMapper {
     @Mapping(source = "city", target = "city")
     @Mapping(source = "pricePerNight", target = "pricePerNight")
     @Mapping(source = "images", target = "images")
-    AccommodationResponseDTO toResponseDto(Accommodation accommodation);
+    AccommodationResponseDTO toResponseDTO(Accommodation accommodation);
+
+    /**
+     * Updates an existing {@link Accommodation} entity with data from an {@link AccommodationUpdateDTO}.
+     * <p>
+     * The following fields are ignored and will not be updated automatically:
+     * <ul>
+     * <li>{@code id}</li>
+     * <li>{@code host}</li>
+     * <li>{@code amenities}</li>
+     * <li>{@code reservations}</li>
+     * <li>{@code comments}</li>
+     * <li>{@code deleted}</li>
+     * <li>{@code createdAt}</li>
+     * <li>{@code updatedAt}</li>
+     * </ul>
+     *
+     * @param dto The DTO containing the updated data.
+     * @param accommodation The target entity to update.
+     */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "host", ignore = true)
+    @Mapping(target = "amenities", ignore = true)
+    @Mapping(target = "reservations", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    void updateEntity(AccommodationUpdateDTO dto, @MappingTarget Accommodation accommodation);
 }

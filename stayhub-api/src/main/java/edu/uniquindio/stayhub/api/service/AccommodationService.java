@@ -3,127 +3,174 @@ package edu.uniquindio.stayhub.api.service;
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationRequestDTO;
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationResponseDTO;
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationUpdateDTO;
-import edu.uniquindio.stayhub.api.exception.UserNotFoundException;
-import edu.uniquindio.stayhub.api.model.Accommodation;
-import edu.uniquindio.stayhub.api.model.User;
+import edu.uniquindio.stayhub.api.dto.notification.NotificationRequestDTO;
+import edu.uniquindio.stayhub.api.exception.AccessDeniedException;
+import edu.uniquindio.stayhub.api.exception.AccommodationNotFoundException;
+import edu.uniquindio.stayhub.api.mapper.AccommodationMapper;
+import edu.uniquindio.stayhub.api.model.*;
 import edu.uniquindio.stayhub.api.repository.AccommodationRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Service layer for managing accommodation-related operations.
+ * Service class for managing accommodation-related operations in the StayHub application.
+ * Handles creation, updating, and soft-deletion of accommodations, with role-based access control.
  */
 @Service
+@Transactional
 public class AccommodationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccommodationService.class);
 
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
+    private final AccommodationMapper accommodationMapper;
+    private final NotificationService notificationService;
 
     @Autowired
-    public AccommodationService(AccommodationRepository accommodationRepository, UserRepository userRepository) {
+    public AccommodationService(AccommodationRepository accommodationRepository, UserRepository userRepository,
+                                AccommodationMapper accommodationMapper, NotificationService notificationService) {
         this.accommodationRepository = accommodationRepository;
         this.userRepository = userRepository;
+        this.accommodationMapper = accommodationMapper;
+        this.notificationService = notificationService;
     }
 
     /**
-     * Creates new accommodation based on the provided request DTO.
+     * Creates new accommodation for the specified host.
      *
-     * @param requestDTO The accommodation creation details
-     * @param hostId The ID of the host creating the accommodation (from authentication context)
-     * @return AccommodationResponseDTO with the created accommodation details
-     * @throws UserNotFoundException if the host is not found
+     * @param requestDTO The accommodation creation details.
+     * @param username The username (email) of the authenticated user.
+     * @return The created accommodation details.
+     * @throws AccessDeniedException If the user is not a host.
      */
-    public AccommodationResponseDTO createAccommodation(AccommodationRequestDTO requestDTO, Long hostId) {
-        // Find the host
-        User host = userRepository.findById(hostId)
-                .orElseThrow(() -> new UserNotFoundException("El host no existe"));
-
-        // Map requestDTO to Accommodation entity
-        Accommodation accommodation = new Accommodation();
-        accommodation.setTitle(requestDTO.getTitle());
-        accommodation.setDescription(requestDTO.getDescription());
-        accommodation.setCity(requestDTO.getCity());
-        accommodation.setPricePerNight(requestDTO.getPricePerNight());
-        accommodation.setCapacity(requestDTO.getCapacity());
-        accommodation.setLongitude(requestDTO.getLongitude());
-        accommodation.setLatitude(requestDTO.getLatitude());
-        accommodation.setLocationDescription(requestDTO.getLocationDescription());
-        accommodation.setMainImage(requestDTO.getMainImage());
-        accommodation.setImages(requestDTO.getImages());
-        accommodation.setHost(host);
+    public AccommodationResponseDTO createAccommodation(AccommodationRequestDTO requestDTO, String username) {
+        LOGGER.info("Creating accommodation for user: {}", username);
+        User user = getUserByEmail(username);
+        if (user.getRole() != Role.HOST) {
+            LOGGER.error("User {} is not a host", username);
+            throw new AccessDeniedException("Solo los anfitriones pueden crear alojamientos");
+        }
+        Accommodation accommodation = accommodationMapper.toEntity(requestDTO);
+        accommodation.setHost(user);
         accommodation.setDeleted(false);
+        Accommodation savedAccommodation = accommodationRepository.save(accommodation);
+        LOGGER.debug("Accommodation created with ID: {}", savedAccommodation.getId());
 
-        // Save to repository
-        accommodation = accommodationRepository.save(accommodation);
+        // Send notification to host
+        notificationService.createNotification(new NotificationRequestDTO(
+                user.getId(),
+                NotificationType.ACCOMMODATION_CREATED,
+                "Your accommodation " + accommodation.getTitle() + " has been created successfully!",
+                NotificationStatus.UNREAD
+        ));
 
-        // Map to response DTO
-        return mapToResponseDTO(accommodation);
+        return accommodationMapper.toResponseDTO(savedAccommodation);
     }
 
     /**
-     * Updates existing accommodation based on the provided ID and update DTO.
+     * Updates an existing accommodation.
      *
-     * @param accommodationId The ID of the accommodation to update
-     * @param updateDTO The accommodation update details
-     * @return AccommodationResponseDTO with the updated accommodation details
-     * @throws UserNotFoundException if the accommodation is not found
+     * @param accommodationId The ID of the accommodation to update.
+     * @param updateDTO The updated accommodation details.
+     * @param username The username (email) of the authenticated user.
+     * @return The updated accommodation details.
+     * @throws AccommodationNotFoundException If the accommodation does not exist.
+     * @throws AccessDeniedException If the user is not the owner or not a host.
      */
-    public AccommodationResponseDTO updateAccommodation(Long accommodationId, AccommodationUpdateDTO updateDTO) {
-        Accommodation accommodation = accommodationRepository.findById(accommodationId)
-                .orElseThrow(() -> new UserNotFoundException("El alojamiento no existe"));
+    public AccommodationResponseDTO updateAccommodation(Long accommodationId, AccommodationUpdateDTO updateDTO, String username) {
+        LOGGER.info("Updating accommodation ID: {} for user: {}", accommodationId, username);
+        Accommodation accommodation = getAccommodationById(accommodationId);
+        User user = getUserByEmail(username);
+        validateHostAndOwnership(user, accommodation, "update");
+        accommodationMapper.updateEntity(updateDTO, accommodation);
+        Accommodation updatedAccommodation = accommodationRepository.save(accommodation);
+        LOGGER.debug("Accommodation ID: {} updated", accommodationId);
 
-        // Update fields from updateDTO (only non-null values)
-        accommodation.setTitle(updateDTO.getTitle());
-        accommodation.setDescription(updateDTO.getDescription());
-        accommodation.setCity(updateDTO.getCity());
-        accommodation.setPricePerNight(updateDTO.getPricePerNight());
-        accommodation.setCapacity(updateDTO.getCapacity());
-        accommodation.setLongitude(updateDTO.getLongitude());
-        accommodation.setLatitude(updateDTO.getLatitude());
-        accommodation.setLocationDescription(updateDTO.getLocationDescription());
-        accommodation.setMainImage(updateDTO.getMainImage());
-        accommodation.setImages(updateDTO.getImages() != null ? updateDTO.getImages() : accommodation.getImages());
+        // Send notification to host
+        notificationService.createNotification(new NotificationRequestDTO(
+                user.getId(),
+                NotificationType.ACCOMMODATION_UPDATED,
+                "Your accommodation " + accommodation.getTitle() + " has been updated successfully!",
+                NotificationStatus.UNREAD
+        ));
 
-        // Save updated accommodation
-        accommodation = accommodationRepository.save(accommodation);
-
-        // Map to response DTO
-        return mapToResponseDTO(accommodation);
+        return accommodationMapper.toResponseDTO(updatedAccommodation);
     }
 
     /**
-     * Soft-deletes accommodation by setting isDeleted to true.
+     * Soft-deletes accommodation by setting its deleted flag to true.
      *
-     * @param accommodationId The ID of the accommodation to delete
-     * @throws UserNotFoundException if the accommodation is not found
+     * @param accommodationId The ID of the accommodation to delete.
+     * @param username The username (email) of the authenticated user.
+     * @throws AccommodationNotFoundException If the accommodation does not exist.
+     * @throws AccessDeniedException If the user is not the owner or not a host.
      */
-    public void deleteAccommodation(Long accommodationId) {
-        Accommodation accommodation = accommodationRepository.findById(accommodationId)
-                .orElseThrow(() -> new UserNotFoundException("El alojamiento no existe"));
+    public void deleteAccommodation(Long accommodationId, String username) {
+        LOGGER.info("Deleting accommodation ID: {} for user: {}", accommodationId, username);
+        Accommodation accommodation = getAccommodationById(accommodationId);
+        User user = getUserByEmail(username);
+        validateHostAndOwnership(user, accommodation, "delete");
         accommodation.setDeleted(true);
         accommodationRepository.save(accommodation);
+        LOGGER.debug("Accommodation ID: {} deleted", accommodationId);
+
+        // Send notification to host
+        notificationService.createNotification(new NotificationRequestDTO(
+                user.getId(),
+                NotificationType.ACCOMMODATION_DELETED,
+                "Your accommodation " + accommodation.getTitle() + " has been deleted successfully!",
+                NotificationStatus.UNREAD
+        ));
     }
 
     /**
-     * Maps an Accommodation entity to an AccommodationResponseDTO.
+     * Retrieves an accommodation entity by its ID, ensuring it is not soft-deleted.
      *
-     * @param accommodation The accommodation entity
-     * @return AccommodationResponseDTO with mapped fields
+     * @param accommodationId The ID of the accommodation.
+     * @return The accommodation entity.
+     * @throws AccommodationNotFoundException If the accommodation does not exist or is deleted.
      */
-    private AccommodationResponseDTO mapToResponseDTO(Accommodation accommodation) {
-        AccommodationResponseDTO responseDTO = new AccommodationResponseDTO();
-        responseDTO.setId(accommodation.getId());
-        responseDTO.setTitle(accommodation.getTitle());
-        responseDTO.setDescription(accommodation.getDescription());
-        responseDTO.setCapacity(accommodation.getCapacity());
-        responseDTO.setMainImage(accommodation.getMainImage());
-        responseDTO.setLongitude(accommodation.getLongitude());
-        responseDTO.setLatitude(accommodation.getLatitude());
-        responseDTO.setLocationDescription(accommodation.getLocationDescription());
-        responseDTO.setCity(accommodation.getCity());
-        responseDTO.setPricePerNight(accommodation.getPricePerNight());
-        responseDTO.setImages(accommodation.getImages());
-        return responseDTO;
+    private Accommodation getAccommodationById(Long accommodationId) {
+        return accommodationRepository.findById(accommodationId)
+                .filter(a -> !a.isDeleted())
+                .orElseThrow(() -> {
+                    LOGGER.error("Accommodation ID {} not found or is deleted", accommodationId);
+                    return new AccommodationNotFoundException("El alojamiento no existe");
+                });
+    }
+
+    /**
+     * Retrieves a user by their email address.
+     *
+     * @param email The email of the user.
+     * @return The user entity.
+     * @throws AccessDeniedException If the user does not exist.
+     */
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    LOGGER.error("User {} not found", email);
+                    return new AccessDeniedException("Usuario no encontrado");
+                });
+    }
+
+    /**
+     * Validates that the authenticated user is a host and is the owner of the accommodation.
+     *
+     * @param user The authenticated user to validate.
+     * @param accommodation The accommodation to check ownership for.
+     * @param action The action being performed (for generating a descriptive error message).
+     * @throws AccessDeniedException If the user is not a host or does not own the accommodation.
+     */
+    private void validateHostAndOwnership(User user, Accommodation accommodation, String action) {
+        if (user.getRole() != Role.HOST || !accommodation.getHost().getId().equals(user.getId())) {
+            LOGGER.error("User {} does not have permission to {} accommodation ID: {}", user.getEmail(), action, accommodation.getId());
+            throw new AccessDeniedException("No tienes permiso para " + action + " este alojamiento");
+        }
     }
 }

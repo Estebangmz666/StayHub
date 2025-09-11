@@ -1,99 +1,194 @@
 package edu.uniquindio.stayhub.api.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * Entity representing accommodation in the StayHub application.
+ * This class maps to the 'accommodations' table in the database and includes
+ * all the necessary fields for managing rental properties, their details,
+ * and relationships with other entities like users, amenities, and comments.
+ */
 @Entity
 @Table(name = "accommodations", indexes = {
         @Index(name = "idx_host_id", columnList = "host_id"),
-        @Index(name = "idx_location", columnList = "latitude, longitude"),
-        @Index(name = "idx_city", columnList = "city"),
-        @Index(name = "idx_deleted", columnList = "isDeleted")
+        @Index(name = "idx_deleted", columnList = "deleted")
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Accommodation {
 
+    /**
+     * The unique identifier for the accommodation.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * The host (owner) of the accommodation.
+     * This is a many-to-one relationship with the User entity.
+     */
+    @ManyToOne
+    @JoinColumn(name = "host_id", nullable = false)
+    @NotNull(message = "El anfitrión es obligatorio")
+    private User host;
+
+    /**
+     * The title of the accommodation listing.
+     */
     @Column(nullable = false)
     @NotBlank(message = "El título es obligatorio")
     @Size(max = 100, message = "El título no puede exceder 100 caracteres")
     private String title;
 
-    @Column(nullable = false, length = 1000)
+    /**
+     * A detailed description of the accommodation.
+     */
+    @Column(nullable = false)
     @NotBlank(message = "La descripción es obligatoria")
     @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres")
     private String description;
 
+    /**
+     * The maximum number of guests the accommodation can host.
+     */
     @Column(nullable = false)
     @NotNull(message = "La capacidad es obligatoria")
-    @Min(value = 1, message = "La capacidad debe ser al menos 1")
+    @Positive(message = "La capacidad debe ser mayor que cero")
     private Integer capacity;
 
-    @Column
-    @URL(message = "La imagen principal debe ser una URL válida")
-    private String mainImage;
-
-    @Column(nullable = false)
-    @NotNull(message = "La longitud es obligatoria")
-    private Double longitude;
-
-    @Column(nullable = false)
-    @NotNull(message = "La latitud es obligatoria")
-    private Double latitude; //Mapbox Stuff xd
-
-    @Column(nullable = false)
-    @NotBlank(message = "La ubicación es obligatoria")
-    @Size(max = 200, message = "La ubicación no puede exceder 200 caracteres")
-    private String locationDescription;
-
-    @Column(nullable = false)
-    @NotBlank(message = "La ciudad es obligatoria")
-    @Size(max = 50, message = "La ciudad no puede exceder 50 caracteres")
-    private String city;
-
+    /**
+     * The price per night for the accommodation.
+     */
     @Column(nullable = false)
     @NotNull(message = "El precio por noche es obligatorio")
     @Positive(message = "El precio debe ser mayor que cero")
     private BigDecimal pricePerNight;
 
+    /**
+     * The URL of the main image for the accommodation listing.
+     */
+    @Column(name = "main_image")
+    @URL(message = "La imagen principal debe ser una URL válida")
+    private String mainImage;
+
+    /**
+     * The longitude coordinate of the accommodation's location.
+     */
+    @Column(nullable = false)
+    @NotNull(message = "La longitud es obligatoria")
+    private Double longitude;
+
+    /**
+     * The latitude coordinate of the accommodation's location.
+     */
+    @Column(nullable = false)
+    @NotNull(message = "La latitud es obligatoria")
+    private Double latitude;
+
+    /**
+     * A description of the location, such as neighborhood or landmarks.
+     */
+    @Column(name = "location_description", nullable = false)
+    @NotBlank(message = "La descripción de la ubicación es obligatoria")
+    @Size(max = 200, message = "La descripción de la ubicación no puede exceder 200 caracteres")
+    private String locationDescription;
+
+    /**
+     * The city where the accommodation is located.
+     */
+    @Column(nullable = false)
+    @NotBlank(message = "La ciudad es obligatoria")
+    @Size(max = 50, message = "La ciudad no puede exceder 50 caracteres")
+    private String city;
+
+    /**
+     * A list of URLs for additional images of the accommodation.
+     */
     @ElementCollection
-    @Column
-    @URL(message = "Cada imagen debe ser una URL válida")
-    @Builder.Default
-    private List<String> images = new ArrayList<>();
+    @CollectionTable(name = "accommodation_images", joinColumns = @JoinColumn(name = "accommodation_id"))
+    @Column(name = "image_url")
+    @NotNull(message = "La lista de imágenes es obligatoria")
+    private List<@URL(message = "Cada imagen debe ser una URL válida") String> images;
 
-    @ManyToOne
-    @JoinColumn(name = "host_id", nullable = false)
-    private User host;
-
+    /**
+     * A list of amenities available at the accommodation.
+     * This is a many-to-many relationship with the Amenity entity.
+     */
     @ManyToMany
     @JoinTable(
             name = "accommodation_amenities",
             joinColumns = @JoinColumn(name = "accommodation_id"),
             inverseJoinColumns = @JoinColumn(name = "amenity_id")
     )
-    @Builder.Default
-    private Set<Amenity> amenities = new HashSet<>();
+    private List<Amenity> amenities;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean isDeleted;
-
+    /**
+     * A list of reservations made for this accommodation.
+     * This is a one-to-many relationship with the Reservation entity.
+     */
     @OneToMany(mappedBy = "accommodation")
-    @Builder.Default
-    private List<Reservation> reservations = new ArrayList<>();
+    private List<Reservation> reservations;
 
-    @Builder.Default
+    /**
+     * A list of comments made about this accommodation.
+     * This is a one-to-many relationship with the Comment entity.
+     */
     @OneToMany(mappedBy = "accommodation")
-    private List<Comment> comments = new ArrayList<>();
+    private List<Comment> comments;
+
+    /**
+     * A soft-delete flag. If true, the accommodation is considered deleted.
+     */
+    @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Builder.Default
+    private boolean deleted = false;
+
+    /**
+     * The timestamp for when the entity was created.
+     * Automatically managed by Hibernate's @CreationTimestamp.
+     */
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    /**
+     * The timestamp for the last update to the entity.
+     * Automatically managed by Hibernate's @UpdateTimestamp.
+     */
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

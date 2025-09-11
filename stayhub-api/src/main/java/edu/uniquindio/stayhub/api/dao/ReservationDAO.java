@@ -4,7 +4,7 @@ import edu.uniquindio.stayhub.api.model.Reservation;
 import edu.uniquindio.stayhub.api.repository.ReservationRepository;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -16,8 +16,8 @@ public class ReservationDAO {
     }
 
     public Reservation saveReservation(Reservation reservation) {
-        LocalDate checkIn = reservation.getCheckInDate();
-        LocalDate checkOut = reservation.getCheckOutDate();
+        LocalDateTime checkIn = reservation.getCheckInDate();
+        LocalDateTime checkOut = reservation.getCheckOutDate();
         if (checkIn.isAfter(checkOut)) {
             throw new IllegalArgumentException("Check-in date must be before check-out date");
         }
@@ -25,6 +25,6 @@ public class ReservationDAO {
     }
 
     public List<Reservation> findActiveByUserId(Long userId) {
-        return reservationRepository.findByUserIdAndIsDeletedFalse(userId);
+        return reservationRepository.findByGuestIdAndDeletedFalse(userId);
     }
 }

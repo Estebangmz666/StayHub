@@ -1,18 +1,81 @@
 package edu.uniquindio.stayhub.api.dto.reservation;
 
 import edu.uniquindio.stayhub.api.model.ReservationStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-@Getter @Setter
+/**
+ * Data Transfer Object for returning reservation details to the client.
+ * This DTO provides a complete representation of a reservation, including its current status and total price.
+ */
+@Getter
+@Setter
+@AllArgsConstructor
+@Schema(description = "DTO for returning reservation details")
 public class ReservationResponseDTO {
+
+    /**
+     * The unique identifier of the reservation.
+     */
+    @Schema(description = "The unique identifier of the reservation", example = "1")
     private Long id;
-    private Long userId;
+
+    /**
+     * The ID of the guest who made the reservation.
+     */
+    @Schema(description = "The ID of the guest who made the reservation", example = "10")
+    private Long guestId;
+
+    /**
+     * The ID of the accommodation that was reserved.
+     */
+    @Schema(description = "The ID of the accommodation that was reserved", example = "25")
     private Long accommodationId;
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
+
+    /**
+     * The check-in date and time.
+     */
+    @Schema(description = "The check-in date and time", example = "2025-11-20T15:00:00")
+    private LocalDateTime checkInDate;
+
+    /**
+     * The check-out date and time.
+     */
+    @Schema(description = "The check-out date and time", example = "2025-11-25T11:00:00")
+    private LocalDateTime checkOutDate;
+
+    /**
+     * The number of guests for the reservation.
+     */
+    @Schema(description = "The number of guests for the reservation", example = "2")
     private Integer numberOfGuests;
+
+    /**
+     * The total price of the reservation.
+     */
+    @Schema(description = "The total price of the reservation", example = "250.00")
+    private BigDecimal totalPrice;
+
+    /**
+     * The current status of the reservation (e.g., PENDING, CONFIRMED, CANCELED).
+     */
+    @Schema(description = "The current status of the reservation", example = "CONFIRMED")
     private ReservationStatus status;
+
+    /**
+     * The date and time the reservation was created.
+     */
+    @Schema(description = "The date and time the reservation was created", example = "2025-11-15T10:00:00")
+    private LocalDateTime createdAt;
+
+    /**
+     * The date and time the reservation was last updated.
+     */
+    @Schema(description = "The date and time the reservation was last updated", example = "2025-11-15T10:00:00")
+    private LocalDateTime updatedAt;
 }

@@ -27,6 +27,6 @@ public class CommentDAO {
     }
 
     public List<Comment> findActiveByAccommodationId(Long accommodationId) {
-        return commentRepository.findByAccommodationIdAndIsDeletedFalseOrderByCreatedAtDesc(accommodationId);
+        return commentRepository.findByAccommodationIdAndDeletedFalseOrderByCreatedAtDesc(accommodationId);
     }
 }

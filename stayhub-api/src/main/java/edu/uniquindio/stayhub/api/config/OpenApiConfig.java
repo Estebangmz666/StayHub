@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration class for OpenAPI (Swagger) documentation of the StayHub API.
- * This class defines the API metadata, servers, and security schemes using Springdoc OpenAPI.
+ * Configuration class for setting up OpenAPI 3.0 documentation for the StayHub API.
+ * Defines metadata such as title, version, description, contact information, and license,
+ * as well as server configurations and security schemes for JWT authentication.
+ * This class is used to generate Swagger UI documentation for the API.
  */
 @Configuration
 @OpenAPIDefinition(
@@ -22,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
                 version = "1.0.0",
                 description = "REST API for managing accommodations, reservations, and user accounts in the StayHub platform",
                 contact = @Contact(
-                        name = "StayHub Development Team",
+                        name = "Esteban Gómez León",
                         email = "estebangumy05@gmail.com"
                 ),
                 license = @License(
@@ -42,12 +44,12 @@ import org.springframework.context.annotation.Configuration;
         }
 )
 public class OpenApiConfig {
-
     /**
-     * Creates and configures the OpenAPI bean for Swagger UI.
-     * Includes a security scheme for Bearer Authentication (JWT) if implemented later.
+     * Configures and provides an OpenAPI bean for Swagger UI documentation.
+     * Includes a security scheme for Bearer Authentication using JWT tokens,
+     * enabling secure access to protected endpoints in the StayHub API.
      *
-     * @return OpenAPI instance with custom configurations
+     * @return An OpenAPI instance with custom configurations for StayHub.
      */
     @Bean
     public OpenAPI customOpenAPI() {
