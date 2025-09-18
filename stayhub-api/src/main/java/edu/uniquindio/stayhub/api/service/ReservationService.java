@@ -17,7 +17,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -42,7 +41,6 @@ public class ReservationService {
     private final NotificationService notificationService;
     private final ReservationMapper reservationMapper;
 
-    @Autowired
     public ReservationService(ReservationRepository reservationRepository, AccommodationRepository accommodationRepository,
                               UserRepository userRepository, NotificationService notificationService,
                               ReservationMapper reservationMapper) {

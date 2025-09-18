@@ -1,5 +1,9 @@
 package edu.uniquindio.stayhub.api.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationRequestDTO;
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationResponseDTO;
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationUpdateDTO;
@@ -7,14 +11,14 @@ import edu.uniquindio.stayhub.api.dto.notification.NotificationRequestDTO;
 import edu.uniquindio.stayhub.api.exception.AccessDeniedException;
 import edu.uniquindio.stayhub.api.exception.AccommodationNotFoundException;
 import edu.uniquindio.stayhub.api.mapper.AccommodationMapper;
-import edu.uniquindio.stayhub.api.model.*;
+import edu.uniquindio.stayhub.api.model.Accommodation;
+import edu.uniquindio.stayhub.api.model.NotificationStatus;
+import edu.uniquindio.stayhub.api.model.NotificationType;
+import edu.uniquindio.stayhub.api.model.Role;
+import edu.uniquindio.stayhub.api.model.User;
 import edu.uniquindio.stayhub.api.repository.AccommodationRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * Service class for managing accommodation-related operations in the StayHub application.
@@ -31,7 +35,6 @@ public class AccommodationService {
     private final AccommodationMapper accommodationMapper;
     private final NotificationService notificationService;
 
-    @Autowired
     public AccommodationService(AccommodationRepository accommodationRepository, UserRepository userRepository,
                                 AccommodationMapper accommodationMapper, NotificationService notificationService) {
         this.accommodationRepository = accommodationRepository;

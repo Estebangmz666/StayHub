@@ -72,10 +72,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
+                        authorizeRequests/*
                                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
-                                .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
-                                .anyRequest().authenticated()
+                                .requestMatchers("/api/v1/auth/login", "/api/auth/register").permitAll()
+                                .requestMatchers("/api/v1/test/**").permitAll()
+                                .anyRequest().authenticated()*/
+                                .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

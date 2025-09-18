@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +38,6 @@ public class ReservationController {
      *
      * @param reservationService The service that handles the business logic for reservations.
      */
-    @Autowired
     public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }

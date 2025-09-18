@@ -1,5 +1,13 @@
 package edu.uniquindio.stayhub.api.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
 import edu.uniquindio.stayhub.api.dto.notification.NotificationRequestDTO;
 import edu.uniquindio.stayhub.api.dto.notification.NotificationResponseDTO;
 import edu.uniquindio.stayhub.api.dto.notification.NotificationUpdateDTO;
@@ -14,14 +22,6 @@ import edu.uniquindio.stayhub.api.repository.NotificationRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service class for managing notification-related operations in the StayHub application.
@@ -38,7 +38,6 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
 
-    @Autowired
     public NotificationService(NotificationRepository notificationRepository, UserRepository userRepository,
                                NotificationMapper notificationMapper) {
         this.notificationRepository = notificationRepository;
