@@ -1,5 +1,6 @@
-package edu.uniquindio.stayhub.api.dto.auth;
+package edu.uniquindio.stayhub.api.dto.auth.passwordReset;
 
+import edu.uniquindio.stayhub.api.dto.auth.UserDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object for a password reset token.
+ * Data Transfer Object for a password-reset token.
  * This DTO is used to represent the state of a password reset token,
  * including its association with a user and its expiration.
  */

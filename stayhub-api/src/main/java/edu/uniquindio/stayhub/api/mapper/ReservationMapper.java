@@ -24,7 +24,7 @@ public interface ReservationMapper {
      * <li>{@code id} (auto-generated)</li>
      * <li>{@code guest} and {@code accommodation} (populated by a service layer)</li>
      * <li>{@code totalPrice} (calculated)</li>
-     * <li>{@code status} (initial status is set by a service)</li>
+     * <li>{@code status} (a service sets initial status)</li>
      * <li>Auditing fields like {@code deleted}, {@code createdAt}, and {@code updatedAt}.</li>
      * </ul>
      * The {@code guestId} from the DTO is used to set the ID of the nested {@code guest} object.

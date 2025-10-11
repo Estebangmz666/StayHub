@@ -1,9 +1,5 @@
 package edu.uniquindio.stayhub.api.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationRequestDTO;
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationResponseDTO;
 import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationUpdateDTO;
@@ -11,18 +7,24 @@ import edu.uniquindio.stayhub.api.dto.notification.NotificationRequestDTO;
 import edu.uniquindio.stayhub.api.exception.AccessDeniedException;
 import edu.uniquindio.stayhub.api.exception.AccommodationNotFoundException;
 import edu.uniquindio.stayhub.api.mapper.AccommodationMapper;
-import edu.uniquindio.stayhub.api.model.Accommodation;
-import edu.uniquindio.stayhub.api.model.NotificationStatus;
-import edu.uniquindio.stayhub.api.model.NotificationType;
-import edu.uniquindio.stayhub.api.model.Role;
-import edu.uniquindio.stayhub.api.model.User;
+import edu.uniquindio.stayhub.api.model.*;
 import edu.uniquindio.stayhub.api.repository.AccommodationRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Positive;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Service class for managing accommodation-related operations in the StayHub application.
- * Handles creation, updating, and soft-deletion of accommodations, with role-based access control.
+ * Handles creation, updating, and soft-deletion of accommodations with role-based access control.
  */
 @Service
 @Transactional
@@ -51,7 +53,7 @@ public class AccommodationService {
      * @return The created accommodation details.
      * @throws AccessDeniedException If the user is not a host.
      */
-    public AccommodationResponseDTO createAccommodation(AccommodationRequestDTO requestDTO, String username) {
+    public AccommodationResponseDTO createAccommodation(AccommodationRequestDTO requestDTO, String username) throws MessagingException {
         LOGGER.info("Creating accommodation for user: {}", username);
         User user = getUserByEmail(username);
         if (user.getRole() != Role.HOST) {
@@ -85,7 +87,7 @@ public class AccommodationService {
      * @throws AccommodationNotFoundException If the accommodation does not exist.
      * @throws AccessDeniedException If the user is not the owner or not a host.
      */
-    public AccommodationResponseDTO updateAccommodation(Long accommodationId, AccommodationUpdateDTO updateDTO, String username) {
+    public AccommodationResponseDTO updateAccommodation(Long accommodationId, AccommodationUpdateDTO updateDTO, String username) throws MessagingException {
         LOGGER.info("Updating accommodation ID: {} for user: {}", accommodationId, username);
         Accommodation accommodation = getAccommodationById(accommodationId);
         User user = getUserByEmail(username);
@@ -113,7 +115,7 @@ public class AccommodationService {
      * @throws AccommodationNotFoundException If the accommodation does not exist.
      * @throws AccessDeniedException If the user is not the owner or not a host.
      */
-    public void deleteAccommodation(Long accommodationId, String username) {
+    public void deleteAccommodation(Long accommodationId, String username) throws MessagingException {
         LOGGER.info("Deleting accommodation ID: {} for user: {}", accommodationId, username);
         Accommodation accommodation = getAccommodationById(accommodationId);
         User user = getUserByEmail(username);
@@ -175,5 +177,55 @@ public class AccommodationService {
             LOGGER.error("User {} does not have permission to {} accommodation ID: {}", user.getEmail(), action, accommodation.getId());
             throw new AccessDeniedException("No tienes permiso para " + action + " este alojamiento");
         }
+    }
+
+    public Page<AccommodationResponseDTO> listAccommodations(Pageable pageable) {
+        LOGGER.info("Fetching all active accommodations with pagination: page={}, size={}",
+                pageable.getPageNumber(), pageable.getPageSize());
+
+        Page<Accommodation> accommodations = accommodationRepository.findAllByDeletedFalse(pageable);
+
+        LOGGER.debug("Retrieved {} accommodations from database", accommodations.getTotalElements());
+
+        return accommodations.map(accommodationMapper::toResponseDTO);
+    }
+
+    public AccommodationResponseDTO getAccommodation(Long id) {
+        LOGGER.info("Fetching accommodation with ID: {}", id);
+
+        Accommodation accommodation = accommodationRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> {
+                    LOGGER.warn("Accommodation not found with ID: {}", id);
+                    return new AccommodationNotFoundException("El alojamiento no existe");
+                });
+
+        LOGGER.debug("Accommodation retrieved successfully with ID: {}", id);
+        return accommodationMapper.toResponseDTO(accommodation);
+    }
+
+    public Page<AccommodationResponseDTO> searchAccommodations(String city,
+                                                               @Positive Integer minCapacity,
+                                                               @Positive BigDecimal maxPrice,
+                                                               List<Long> amenityIds,
+                                                               Pageable pageable) {
+        LOGGER.info("Searching accommodations with filters: city={}, minCapacity={}, maxPrice={}, amenityIds={}",
+                city, minCapacity, maxPrice, amenityIds);
+
+        if (amenityIds != null && amenityIds.contains(null)) {
+            LOGGER.error("Amenity IDs cannot contain null values");
+            throw new IllegalArgumentException("Las listas de IDs de amenidades no pueden contener valores nulos");
+        }
+
+        Page<Accommodation> result = accommodationRepository.findByFilters(
+                city,
+                minCapacity,
+                maxPrice,
+                amenityIds,
+                pageable
+        );
+
+        LOGGER.debug("Search returned {} total accommodations", result.getTotalElements());
+
+        return result.map(accommodationMapper::toResponseDTO);
     }
 }

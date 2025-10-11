@@ -6,7 +6,7 @@ import lombok.Setter;
 
 /**
  * Data Transfer Object for representing an amenity.
- * This DTO is used to list the amenities available for an accommodation.
+ * This DTO is used to list the amenities available for accommodation.
  */
 @Getter
 @Setter

@@ -38,7 +38,7 @@ public interface AmenityRepository extends JpaRepository<Amenity, Long> {
 
     /**
      * Retrieves a list of active amenities whose name contains the specified string,
-     * ignoring case.
+     * ignoring a case.
      * @param name The string to search for within the amenity names.
      * @return A list of matching active Amenity entities.
      */

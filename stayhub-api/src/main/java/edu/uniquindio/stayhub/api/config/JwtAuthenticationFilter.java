@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * <p>
      * The process is as follows:
      * <ol>
-     * <li>Checks for the presence of the "Authorization" header and if it starts with "Bearer ".</li>
+     * <li>Checks for the presence of the "Authorization" header and if it starts with "Bearer".</li>
      * <li>Extracts the token and attempts to get the username from it.</li>
      * <li>If the username is valid and no authentication has been set in the security context, it loads the user details.</li>
      * <li>Validates the token against the user details.</li>
@@ -67,35 +67,63 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            try {
-                String username = jwtService.extractUsername(token);
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (jwtService.isTokenValid(token, userDetails)) {
-                        UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                        LOGGER.info("Successfully authenticated user: {} for request: {}", username, request.getRequestURI());
-                    } else {
-                        LOGGER.warn("Invalid JWT token for user: {} for request: {}", username, request.getRequestURI());
-                    }
-                }
-            } catch (ExpiredJwtException e) {
-                LOGGER.error("JWT token expired for request: {}", request.getRequestURI());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token has expired");
-                return;
-            } catch (JwtException e) {
-                LOGGER.error("Invalid JWT token for request: {}", request.getRequestURI(), e);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid token");
-                return;
-            }
-        } else {
+        String userIdHeader = request.getHeader("X-User-Id");
+
+        if (header == null || !header.startsWith("Bearer ")) {
             LOGGER.debug("No JWT token found in request: {}", request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String token = header.substring(7);
+        try {
+            String username = jwtService.extractUsername(token);
+            Long jwtUserId = jwtService.extractUserId(token);
+            if (request.getRequestURI().contains("/profile")) {
+                if (userIdHeader == null) {
+                    LOGGER.error("Missing X-User-Id header for request: {}", request.getRequestURI());
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("Missing X-User-Id header");
+                    return;
+                }
+                try {
+                    Long userId = Long.parseLong(userIdHeader);
+                    if (!jwtUserId.equals(userId)) {
+                        LOGGER.error("X-User-Id {} does not match JWT userId {} for request: {}", userId, jwtUserId, request.getRequestURI());
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("Invalid X-User-Id");
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    LOGGER.error("Invalid X-User-Id format for request: {}", request.getRequestURI());
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("Invalid X-User-Id format");
+                    return;
+                }
+            }
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtService.isTokenValid(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    LOGGER.info("Successfully authenticated user: {} for request: {}", username, request.getRequestURI());
+                } else {
+                    LOGGER.warn("Invalid JWT token for user: {} for request: {}", username, request.getRequestURI());
+                }
+            }
+        } catch (ExpiredJwtException e) {
+            LOGGER.error("JWT token expired for request: {}", request.getRequestURI());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token has expired");
+            return;
+        } catch (JwtException e) {
+            LOGGER.error("Invalid JWT token for request: {}", request.getRequestURI(), e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid token");
+            return;
         }
         filterChain.doFilter(request, response);
     }

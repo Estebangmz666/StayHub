@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Entity representing a user in the StayHub application.
- * This class stores the user's personal and authentication information,
+ * This class stores the user's personal and authentication information
  * and includes validation constraints to ensure data integrity.
  */
 @Entity

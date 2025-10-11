@@ -1,17 +1,18 @@
 package edu.uniquindio.stayhub.api.service;
 
 import edu.uniquindio.stayhub.api.dto.auth.TokenResponseDTO;
+import edu.uniquindio.stayhub.api.dto.auth.passwordReset.PasswordResetRequestDTO;
+import edu.uniquindio.stayhub.api.dto.auth.passwordReset.ResetPasswordDTO;
 import edu.uniquindio.stayhub.api.dto.user.UpdateProfileDTO;
 import edu.uniquindio.stayhub.api.dto.user.UserLoginDTO;
 import edu.uniquindio.stayhub.api.dto.user.UserRegistrationDTO;
 import edu.uniquindio.stayhub.api.dto.user.UserResponseDTO;
+import edu.uniquindio.stayhub.api.exception.EmailAlreadyExistsException;
 import edu.uniquindio.stayhub.api.exception.InvalidPasswordException;
 import edu.uniquindio.stayhub.api.exception.InvalidTokenException;
 import edu.uniquindio.stayhub.api.exception.UserNotFoundException;
 import edu.uniquindio.stayhub.api.mapper.UserMapper;
-import edu.uniquindio.stayhub.api.model.HostProfile;
 import edu.uniquindio.stayhub.api.model.PasswordResetToken;
-import edu.uniquindio.stayhub.api.model.Role;
 import edu.uniquindio.stayhub.api.model.User;
 import edu.uniquindio.stayhub.api.repository.PasswordResetTokenRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
@@ -22,32 +23,26 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Base64;
 
-/**
- * Service class for managing user-related operations, including authentication, registration,
- * profile updates, and password management.
- */
 @Validated
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
-    /**
-     * Loads a user by their username (email) for Spring Security authentication.
-     *
-     * @param email The email of the user to load.
-     * @return A UserDetails object for the authenticated user.
-     * @throws UsernameNotFoundException if the user with the given email is not found.
-     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
@@ -59,134 +54,19 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    /**
-     * Saves a new user to the database after encoding their password.
-     *
-     * @param user The user entity to be saved.
-     * @return The saved user entity.
-     */
-    public User saveUser(@Valid User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    /**
-     * Updates an existing user's profile information. This includes general user details
-     * and specific details for hosts if the user's role is HOST.
-     *
-     * @param userId The ID of the user to update.
-     * @param updatedUser The DTO containing the new profile information.
-     * @return A DTO representing the updated user's profile.
-     * @throws UserNotFoundException if the user with the given ID does not exist.
-     */
-    public UserResponseDTO updateProfile(Long userId, @Valid UpdateProfileDTO updatedUser) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
-        user.setName(updatedUser.getName());
-        user.setPhoneNumber(updatedUser.getPhoneNumber());
-        user.setProfilePicture(updatedUser.getProfilePicture());
-        if (user.getRole() == Role.HOST) {
-            HostProfile profile = user.getHostProfile();
-            if (profile == null) {
-                profile = new HostProfile();
-                profile.setUser(user);
-                user.setHostProfile(profile);
-            }
-            if (updatedUser.getDescription() != null) {
-                profile.setDescription(updatedUser.getDescription());
-            }
-            if (updatedUser.getLegalDocuments() != null) {
-                profile.setLegalDocuments(updatedUser.getLegalDocuments());
-            }
-        }
-        User updatedUserEntity = userRepository.save(user);
-        return userMapper.toResponseDto(updatedUserEntity);
-    }
-
-    /**
-     * Changes a user's password after validating their current password.
-     *
-     * @param userId The ID of the user whose password is to be changed.
-     * @param currentPassword The user's current password.
-     * @param newPassword The new password to be set.
-     * @throws UserNotFoundException if the user with the given ID does not exist.
-     * @throws InvalidPasswordException if the provided current password does not match the stored password.
-     */
-    public void changePassword(Long userId, String currentPassword, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
-        if (passwordEncoder.matches(currentPassword, user.getPassword())) {
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-        } else {
-            throw new InvalidPasswordException("La contraseña actual es incorrecta");
-        }
-    }
-
-    /**
-     * Creates and saves a new password reset token for a user.
-     * It first deletes any existing token for the user.
-     *
-     * @param user The user for whom the token is being created.
-     * @param token The token string.
-     */
-    public void createPasswordResetToken(User user, String token) {
-        passwordResetTokenRepository.deleteByUser(user);
-        PasswordResetToken resetToken = new PasswordResetToken();
-        resetToken.setToken(token);
-        resetToken.setUser(user);
-        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(15));
-        passwordResetTokenRepository.save(resetToken);
-    }
-
-    /**
-     * Resets a user's password using a valid password reset token.
-     *
-     * @param token The password reset token.
-     * @param newPassword The new password to be set.
-     * @throws InvalidTokenException if the token is invalid or has expired.
-     */
-    public void resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new InvalidTokenException("Token inválido"));
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new InvalidTokenException("El token ha expirado");
-        }
-        User user = resetToken.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-        passwordResetTokenRepository.delete(resetToken);
-    }
-
-    /**
-     * Registers a new user with the system. It checks for an existing email,
-     * encrypts the password, creates the user entity, and returns a JWT token.
-     *
-     * @param userDTO The DTO containing the user registration details.
-     * @return A DTO containing the generated JWT token.
-     * @throws IllegalStateException if the email provided is already in use.
-     */
-    public TokenResponseDTO registerUser(@Valid UserRegistrationDTO userDTO) {
+    @Transactional
+    public UserResponseDTO registerUser(@Valid UserRegistrationDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new IllegalStateException("El correo electrónico ya está en uso");
+            throw new EmailAlreadyExistsException("El correo electrónico ya está en uso");
         }
         User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userMapper.setHostProfile(user);
-        user = saveUser(user);
-        String token = jwtService.generateToken(user);
-        return new TokenResponseDTO(token);
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponseDto(savedUser);
     }
 
-    /**
-     * Authenticates a user based on their login credentials. If successful,
-     * it returns a JWT token.
-     *
-     * @param loginDTO The DTO containing the user's email and password.
-     * @return A DTO containing the generated JWT token.
-     * @throws UserNotFoundException if the user's email is not found.
-     * @throws InvalidPasswordException if the password does not match the stored password.
-     */
+    @Transactional(readOnly = true)
     public TokenResponseDTO loginUser(@Valid UserLoginDTO loginDTO) {
         User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
@@ -195,5 +75,73 @@ public class UserService implements UserDetailsService {
         }
         String token = jwtService.generateToken(user);
         return new TokenResponseDTO(token);
+    }
+
+    @Transactional
+    public UserResponseDTO updateProfile(Long userId, @Valid UpdateProfileDTO updatedUser) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+        userMapper.updateUser(updatedUser, user);
+        userMapper.updateHostProfile(updatedUser, user);
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponseDto(savedUser);
+    }
+
+    @Transactional
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new InvalidPasswordException("La contraseña actual es incorrecta");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void requestPasswordReset(@Valid PasswordResetRequestDTO requestDTO) {
+        LOGGER.info("Processing password reset request for email: {}", requestDTO.getEmail());
+        User user = userRepository.findByEmail(requestDTO.getEmail()).orElseThrow(()
+                -> new UserNotFoundException("Usuario no encontrado"));
+
+        Long activeTokens = passwordResetTokenRepository.countByUserAndUsedFalse(user);
+        if (activeTokens >= 3) {
+            LOGGER.warn("Too many active password reset tokens for user: {}", user.getEmail());
+            throw new IllegalStateException("Demasiadas solicitudes de restablecimiento de contraseña. Intente de nuevo más tarde.");
+        }
+
+        passwordResetTokenRepository.deleteByUser(user);
+        byte[] randomBytes = new byte[24];
+        new SecureRandom().nextBytes(randomBytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(15));
+        resetToken.setUsed(false);
+        passwordResetTokenRepository.save(resetToken);
+        LOGGER.debug("Password reset token generated for user: {}", user.getEmail());
+
+        try {
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
+            LOGGER.info("Password reset email sent to: {}", user.getEmail());
+        } catch (Exception e) {
+            LOGGER.error("Failed to send password reset email to: {}", user.getEmail(), e);
+            throw new RuntimeException("Error al enviar el correo de restablecimiento");
+        }
+    }
+
+    @Transactional
+    public void resetPassword(@Valid ResetPasswordDTO resetDTO) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenAndUsedFalse(resetDTO.getToken())
+                .orElseThrow(() -> new InvalidTokenException("Token inválido o ya utilizado"));
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidTokenException("El token ha expirado");
+        }
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(resetDTO.getNewPassword()));
+        userRepository.save(user);
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
     }
 }

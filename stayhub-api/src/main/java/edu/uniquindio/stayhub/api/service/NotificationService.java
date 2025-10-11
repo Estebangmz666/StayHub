@@ -1,13 +1,5 @@
 package edu.uniquindio.stayhub.api.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
 import edu.uniquindio.stayhub.api.dto.notification.NotificationRequestDTO;
 import edu.uniquindio.stayhub.api.dto.notification.NotificationResponseDTO;
 import edu.uniquindio.stayhub.api.dto.notification.NotificationUpdateDTO;
@@ -20,8 +12,16 @@ import edu.uniquindio.stayhub.api.model.NotificationStatus;
 import edu.uniquindio.stayhub.api.model.User;
 import edu.uniquindio.stayhub.api.repository.NotificationRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing notification-related operations in the StayHub application.
@@ -37,27 +37,32 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
+    private final EmailService emailService;
 
     public NotificationService(NotificationRepository notificationRepository, UserRepository userRepository,
-                               NotificationMapper notificationMapper) {
+                               NotificationMapper notificationMapper, EmailService emailService) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
         this.notificationMapper = notificationMapper;
+        this.emailService = emailService;
     }
 
     /**
-     * Creates a new notification for the specified user.
+     * Creates a new notification for the specified user and sends it via email.
      *
      * @param requestDTO The notification creation details.
      * @throws UserNotFoundException If the user does not exist.
      */
-    public void createNotification(@Valid NotificationRequestDTO requestDTO) {
+    public void createNotification(@Valid NotificationRequestDTO requestDTO) throws MessagingException {
         LOGGER.info("Creating notification for user ID: {}", requestDTO.getUserId());
         User user = getUserById(requestDTO.getUserId());
+
         Notification notification = notificationMapper.toEntity(requestDTO);
         notification.setUser(user);
         notification.setDeleted(false);
         Notification savedNotification = notificationRepository.save(notification);
+
+        emailService.sendEmailNotification(requestDTO, user.getEmail());
         LOGGER.debug("Notification created with ID: {}", savedNotification.getId());
         notificationMapper.toResponseDTO(savedNotification);
     }
@@ -187,7 +192,7 @@ public class NotificationService {
      *
      * @param user The user to validate.
      * @param notification The notification to check ownership for.
-     * @param action The action being performed (for error message).
+     * @param action The action being performed (for an error message).
      * @throws AccessDeniedException If the user does not own the notification.
      */
     private void validateUserOwnership(User user, Notification notification, String action) {

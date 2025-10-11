@@ -2,6 +2,8 @@ package edu.uniquindio.stayhub.api.repository;
 
 import edu.uniquindio.stayhub.api.model.Reservation;
 import edu.uniquindio.stayhub.api.model.ReservationStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -71,4 +73,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      * @return A list of reservations.
      */
     List<Reservation> findByCheckInDate(LocalDateTime checkInDate);
+
+    Page<Reservation> findByGuestIdAndStatusAndDeletedFalse(Long guestId, ReservationStatus status, Pageable pageable);
+    Page<Reservation> findByGuestIdAndDeletedFalse(Long guestId, Pageable pageable);
+    Page<Reservation> findByAccommodationIdAndStatusAndDeletedFalse(Long accommodationId, ReservationStatus status, Pageable pageable);
+    Page<Reservation> findByAccommodationIdAndDeletedFalse(Long accommodationId, Pageable pageable);
 }

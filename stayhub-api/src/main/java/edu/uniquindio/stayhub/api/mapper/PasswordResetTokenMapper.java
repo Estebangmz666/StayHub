@@ -1,6 +1,6 @@
 package edu.uniquindio.stayhub.api.mapper;
 
-import edu.uniquindio.stayhub.api.dto.auth.PasswordResetTokenDTO;
+import edu.uniquindio.stayhub.api.dto.auth.passwordReset.PasswordResetTokenDTO;
 import edu.uniquindio.stayhub.api.dto.auth.UserDTO;
 import edu.uniquindio.stayhub.api.model.PasswordResetToken;
 import org.mapstruct.Mapper;

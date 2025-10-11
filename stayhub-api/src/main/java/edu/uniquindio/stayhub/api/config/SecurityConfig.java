@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,7 @@ import java.util.List;
  * It integrates a custom JWT authentication filter to secure API endpoints.
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtService jwtService;
@@ -70,17 +73,48 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests/*
-                                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
-                                .requestMatchers("/api/v1/auth/login", "/api/auth/register").permitAll()
-                                .requestMatchers("/api/v1/test/**").permitAll()
-                                .anyRequest().authenticated()*/
-                                .anyRequest().permitAll()
+                        authorizeRequests
+                                // === PUBLIC ENDPOINTS ===
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() //TODO Replace in prod
+
+                                .requestMatchers(
+                                        "/api/v1/users/register",
+                                        "/api/v1/users/login",
+                                        "/api/v1/users/request-password-reset",
+                                        "/api/v1/users/reset-password").permitAll()
+
+                                .requestMatchers(
+                                        "GET", "/api/v1/accommodations",
+                                        "GET", "/api/v1/accommodations/**",
+                                        "GET", "/api/v1/accommodations/search"
+                                ).permitAll()
+
+                                // === PROTECTED ENDPOINTS ===
+                                .requestMatchers(
+                                        "PUT", "/api/v1/users/profile"
+                                ).authenticated()
+
+                                .requestMatchers(
+                                        "POST", "/api/v1/accommodations",
+                                        "PUT", "/api/v1/accommodations/**",
+                                        "DELETE", "/api/v1/accommodations/**"
+                                ).authenticated()
+
+                                .requestMatchers(
+                                        "GET", "/api/v1/reservations/",
+                                        "POST", "/api/v1/reservations/",
+                                        "PUT", "/api/v1/reservations/**",
+                                        "DELETE", "/api/v1/reservations/**",
+                                        "GET", "/api/v1/reservations/accommodations/**"
+                                ).authenticated()
+
+                                // === DEFAULT ENDPOINTS ===
+                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
@@ -93,7 +127,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3030"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

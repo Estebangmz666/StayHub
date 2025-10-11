@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for managing Accommodation entities.
@@ -40,7 +41,7 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
     List<String> findDistinctCities();
 
     /**
-     * Finds cities containing the specified query string, ignoring case, from non-deleted accommodations.
+     * Finds cities containing the specified query string, ignoring a case, from non-deleted accommodations.
      * @param query The city search query.
      * @return A list of matching city names.
      */
@@ -84,4 +85,22 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
                                        @Param("minPrice") BigDecimal minPrice,
                                        @Param("maxPrice") BigDecimal maxPrice,
                                        Pageable pageable);
+
+
+    Page<Accommodation> findAllByDeletedFalse(Pageable pageable);
+
+    Optional<Accommodation> findByIdAndDeletedFalse(Long id);
+
+    @Query("SELECT a FROM Accommodation a WHERE " +
+            "(:city IS NULL OR a.city = :city) AND " +
+            "(:minCapacity IS NULL OR a.capacity >= :minCapacity) AND " +
+            "(:maxPrice IS NULL OR a.pricePerNight <= :maxPrice) AND " +
+            "a.deleted = false AND " +
+            "(:amenityIds IS EMPTY OR EXISTS (SELECT 1 FROM a.amenities am WHERE am.id IN :amenityIds))")
+    Page<Accommodation> findByFilters(
+            @Param("city") String city,
+            @Param("minCapacity") Integer minCapacity,
+            @Param("maxPrice") BigDecimal maxPrice,
+            @Param("amenityIds") List<Long> amenityIds,
+            Pageable pageable);
 }

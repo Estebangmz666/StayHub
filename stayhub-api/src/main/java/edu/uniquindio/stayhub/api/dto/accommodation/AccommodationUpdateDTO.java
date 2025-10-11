@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @Setter
 @Getter
+@AllArgsConstructor
 @Schema(description = "Data Transfer Object for updating an existing accommodation")
 public class AccommodationUpdateDTO {
     // Getters and setters

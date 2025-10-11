@@ -14,18 +14,17 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 /**
  * Service class for handling JWT token generation and validation in the StayHub application.
- * Generates tokens with user email and role, and validates tokens using a secret key loaded from environment variables.
+ * Generates tokens with user email, userId and role, and validates tokens using a secret key loaded from environment variables.
  */
 @Service
 public class JwtService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
-    private final Key SECRET_KEY;
+    private final SecretKey SECRET_KEY;
     private final long EXPIRATION_TIME;
 
     /**
@@ -49,6 +48,7 @@ public class JwtService {
         LOGGER.info("Generating JWT token for user: {}", user.getEmail());
         String token = Jwts.builder()
                 .subject(user.getEmail())
+                .claim("userId", user.getId())
                 .claim("role", user.getRole().name())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -89,7 +89,7 @@ public class JwtService {
         LOGGER.info("Validating JWT token");
         try {
             Jwts.parser()
-                    .verifyWith((SecretKey) SECRET_KEY)
+                    .verifyWith(SECRET_KEY)
                     .build()
                     .parseSignedClaims(token);
             LOGGER.debug("JWT token validated successfully");
@@ -115,7 +115,7 @@ public class JwtService {
         LOGGER.debug("Extracting username from JWT token");
         try {
             Claims claims = Jwts.parser()
-                    .verifyWith((SecretKey) SECRET_KEY)
+                    .verifyWith(SECRET_KEY)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -127,6 +127,34 @@ public class JwtService {
             throw e;
         } catch (JwtException e) {
             LOGGER.error("Invalid JWT token while extracting username: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Extracts the userId from a JWT token.
+     *
+     * @param token The JWT token.
+     * @return The userId extracted from the token.
+     * @throws ExpiredJwtException If the token has expired.
+     * @throws JwtException If the token is invalid.
+     */
+    public Long extractUserId(String token) {
+        LOGGER.debug("Extracting userId from JWT token");
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(SECRET_KEY)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            Long userId = claims.get("userId", Long.class);
+            LOGGER.debug("UserId extracted: {}", userId);
+            return userId;
+        } catch (ExpiredJwtException e) {
+            LOGGER.error("JWT token expired while extracting userId: {}", e.getMessage());
+            throw e;
+        } catch (JwtException e) {
+            LOGGER.error("Invalid JWT token while extracting userId: {}", e.getMessage());
             throw e;
         }
     }
@@ -160,7 +188,7 @@ public class JwtService {
     private boolean isTokenExpired(String token) {
         try {
             Date expiration = Jwts.parser()
-                    .verifyWith((SecretKey) SECRET_KEY)
+                    .verifyWith(SECRET_KEY)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()

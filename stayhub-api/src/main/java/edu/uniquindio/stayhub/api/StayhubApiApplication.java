@@ -3,6 +3,7 @@ package edu.uniquindio.stayhub.api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Main entry point for the Stayhub API application.
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServic
  * component scanning for the entire application. The security autoconfiguration
  * for the UserDetailsService is excluded because a custom one is provided.
  */
+@EnableScheduling
 @SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
 public class StayhubApiApplication {
     /**

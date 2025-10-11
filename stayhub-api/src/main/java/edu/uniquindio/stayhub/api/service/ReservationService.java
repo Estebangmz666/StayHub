@@ -13,17 +13,18 @@ import edu.uniquindio.stayhub.api.model.*;
 import edu.uniquindio.stayhub.api.repository.AccommodationRepository;
 import edu.uniquindio.stayhub.api.repository.ReservationRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service class for managing reservation-related operations in the StayHub application.
@@ -61,7 +62,7 @@ public class ReservationService {
      * @throws AccommodationNotFoundException If the accommodation does not exist.
      * @throws InvalidReservationDatesException If the dates are invalid or unavailable.
      */
-    public ReservationResponseDTO createReservation(@Valid ReservationRequestDTO requestDTO, String username) {
+    public ReservationResponseDTO createReservation(@Valid ReservationRequestDTO requestDTO, String username) throws MessagingException {
         LOGGER.info("Creating reservation for user: {}", username);
         User guest = getUserByEmail(username);
         if (guest.getRole() != Role.GUEST) {
@@ -83,7 +84,6 @@ public class ReservationService {
         Reservation savedReservation = reservationRepository.save(reservation);
         LOGGER.debug("Reservation created with ID: {}", savedReservation.getId());
 
-        // Send notification to guest
         notificationService.createNotification(new NotificationRequestDTO(
                 guest.getId(),
                 NotificationType.RESERVATION_CREATED,
@@ -91,7 +91,6 @@ public class ReservationService {
                 NotificationStatus.UNREAD
         ));
 
-        // Send notification to host
         notificationService.createNotification(new NotificationRequestDTO(
                 accommodation.getHost().getId(),
                 NotificationType.RESERVATION_REQUESTED,
@@ -112,16 +111,15 @@ public class ReservationService {
      * @throws ReservationNotFoundException If the reservation does not exist.
      * @throws AccessDeniedException If the user does not have permission.
      */
-    public ReservationResponseDTO updateReservation(Long reservationId, @Valid ReservationUpdateDTO updateDTO, String username) {
+    public ReservationResponseDTO updateReservation(Long reservationId, @Valid ReservationUpdateDTO updateDTO, String username) throws MessagingException {
         LOGGER.info("Updating reservation ID: {} for user: {}", reservationId, username);
-        Reservation reservation = getReservationById(reservationId);
+        Reservation reservation = getReservationByIdInternal(reservationId);
         User authenticatedUser = getUserByEmail(username);
         validateUserPermission(authenticatedUser, reservation, "actualizar");
         reservationMapper.updateEntity(updateDTO, reservation);
         Reservation updatedReservation = reservationRepository.save(reservation);
         LOGGER.debug("Reservation ID: {} updated", reservationId);
 
-        // Send notification to guest
         notificationService.createNotification(new NotificationRequestDTO(
                 reservation.getGuest().getId(),
                 NotificationType.RESERVATION_UPDATED,
@@ -129,7 +127,6 @@ public class ReservationService {
                 NotificationStatus.UNREAD
         ));
 
-        // Send notification to host
         notificationService.createNotification(new NotificationRequestDTO(
                 reservation.getAccommodation().getHost().getId(),
                 NotificationType.RESERVATION_UPDATED,
@@ -148,9 +145,9 @@ public class ReservationService {
      * @throws ReservationNotFoundException If the reservation does not exist.
      * @throws AccessDeniedException If the user does not have permission.
      */
-    public void cancelReservation(Long reservationId, String username) {
+    public void cancelReservation(Long reservationId, String username) throws MessagingException {
         LOGGER.info("Cancelling reservation ID: {} for user: {}", reservationId, username);
-        Reservation reservation = getReservationById(reservationId);
+        Reservation reservation = getReservationByIdInternal(reservationId);
         User authenticatedUser = getUserByEmail(username);
         validateUserPermission(authenticatedUser, reservation, "cancelar");
         reservation.setStatus(ReservationStatus.CANCELLED);
@@ -158,7 +155,6 @@ public class ReservationService {
         reservationRepository.save(reservation);
         LOGGER.debug("Reservation ID: {} cancelled", reservationId);
 
-        // Send notification to guest
         notificationService.createNotification(new NotificationRequestDTO(
                 reservation.getGuest().getId(),
                 NotificationType.RESERVATION_CANCELLED,
@@ -166,7 +162,6 @@ public class ReservationService {
                 NotificationStatus.UNREAD
         ));
 
-        // Send notification to host
         notificationService.createNotification(new NotificationRequestDTO(
                 reservation.getAccommodation().getHost().getId(),
                 NotificationType.RESERVATION_CANCELLED,
@@ -175,37 +170,34 @@ public class ReservationService {
         ));
     }
 
-    /**
-     * Retrieves reservations for a guest, optionally filtered by status.
-     *
-     * @param guestId The ID of the guest.
-     * @param username The username (email) of the authenticated user.
-     * @param status The reservation status to filter by (optional).
-     * @return A list of reservation details.
-     * @throws AccessDeniedException If the user does not have permission.
-     */
-    public List<ReservationResponseDTO> getReservationsByGuest(Long guestId, String username, String status) {
-        LOGGER.info("Retrieving reservations for guest ID: {}, requested by: {}", guestId, username);
-        User authenticatedUser = getUserByEmail(username);
-        if (!authenticatedUser.getId().equals(guestId) && authenticatedUser.getRole() != Role.HOST) {
-            LOGGER.error("User {} does not have permission to view reservations for guest ID: {}", username, guestId);
-            throw new AccessDeniedException("No tienes permiso para ver las reservas de este usuario");
-        }
-        List<Reservation> reservations;
+    public Page<ReservationResponseDTO> getReservationsByGuest(
+            String username,
+            String status,
+            Pageable pageable) {
+        LOGGER.info("Fetching reservations for guest: {}, status: {}, page: {}", username, status, pageable.getPageNumber());
+
+        User user = getUserByEmail(username);
+
+        Page<Reservation> reservations;
+
         if (status != null && !status.isEmpty()) {
             try {
                 ReservationStatus reservationStatus = ReservationStatus.valueOf(status.toUpperCase());
-                reservations = reservationRepository.findByGuestIdAndStatusAndDeletedFalse(guestId, reservationStatus);
+                reservations = reservationRepository.findByGuestIdAndStatusAndDeletedFalse(
+                        user.getId(),
+                        reservationStatus,
+                        pageable
+                );
             } catch (IllegalArgumentException e) {
                 LOGGER.error("Invalid reservation status: {}", status);
                 throw new IllegalArgumentException("Estado de reserva inválido: " + status);
             }
         } else {
-            reservations = reservationRepository.findByGuestIdAndDeletedFalse(guestId);
+            reservations = reservationRepository.findByGuestIdAndDeletedFalse(user.getId(), pageable);
         }
-        return reservations.stream()
-                .map(reservationMapper::toResponseDTO)
-                .collect(Collectors.toList());
+
+        LOGGER.debug("Retrieved {} reservations for guest: {}", reservations.getTotalElements(), username);
+        return reservations.map(reservationMapper::toResponseDTO);
     }
 
     /**
@@ -217,39 +209,58 @@ public class ReservationService {
      * @return A list of reservation details.
      * @throws AccessDeniedException If the user is not the host of the accommodation.
      */
-    public List<ReservationResponseDTO> getReservationsByAccommodation(Long accommodationId, String username, String status) {
-        LOGGER.info("Retrieving reservations for accommodation ID: {}, requested by: {}", accommodationId, username);
-        User authenticatedUser = getUserByEmail(username);
+    public Page<ReservationResponseDTO> getReservationsByAccommodation(
+            Long accommodationId,
+            String username,
+            String status,
+            Pageable pageable) {
+        LOGGER.info("Fetching reservations for accommodation ID: {}, requested by: {}, status: {}",
+                accommodationId, username, status);
+
+        // Validar que el accommodation existe
         Accommodation accommodation = getAccommodationById(accommodationId);
-        if (!authenticatedUser.getId().equals(accommodation.getHost().getId())) {
-            LOGGER.error("User {} does not have permission to view reservations for accommodation ID: {}", username, accommodationId);
+
+        // Validar que el usuario es el host del accommodation
+        User user = getUserByEmail(username);
+
+        if (!accommodation.getHost().getId().equals(user.getId())) {
+            LOGGER.error("User {} attempted to access reservations for accommodation they don't own", username);
             throw new AccessDeniedException("No tienes permiso para ver las reservas de este alojamiento");
         }
-        List<Reservation> reservations;
+
+        Page<Reservation> reservations;
+
         if (status != null && !status.isEmpty()) {
             try {
                 ReservationStatus reservationStatus = ReservationStatus.valueOf(status.toUpperCase());
-                reservations = reservationRepository.findByAccommodationIdAndStatusAndDeletedFalse(accommodationId, reservationStatus);
+                reservations = reservationRepository.findByAccommodationIdAndStatusAndDeletedFalse(
+                        accommodationId,
+                        reservationStatus,
+                        pageable
+                );
             } catch (IllegalArgumentException e) {
                 LOGGER.error("Invalid reservation status: {}", status);
                 throw new IllegalArgumentException("Estado de reserva inválido: " + status);
             }
         } else {
-            reservations = reservationRepository.findByAccommodationIdAndDeletedFalse(accommodationId);
+            reservations = reservationRepository.findByAccommodationIdAndDeletedFalse(
+                    accommodationId,
+                    pageable
+            );
         }
-        return reservations.stream()
-                .map(reservationMapper::toResponseDTO)
-                .collect(Collectors.toList());
+
+        LOGGER.debug("Retrieved {} reservations for accommodation ID: {}", reservations.getTotalElements(), accommodationId);
+        return reservations.map(reservationMapper::toResponseDTO);
     }
 
     /**
-     * Retrieves a reservation by ID.
+     * Retrieves a reservation entity by ID (internal use only).
      *
      * @param reservationId The ID of the reservation.
      * @return The reservation entity.
      * @throws ReservationNotFoundException If the reservation does not exist or is deleted.
      */
-    private Reservation getReservationById(Long reservationId) {
+    private Reservation getReservationByIdInternal(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
                 .orElseThrow(() -> {
@@ -274,6 +285,31 @@ public class ReservationService {
                 });
     }
 
+    public ReservationResponseDTO getReservationById(Long reservationId, String username) {
+        LOGGER.info("Fetching reservation with ID: {} for user: {}", reservationId, username);
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .filter(r -> !r.isDeleted())
+                .orElseThrow(() -> {
+                    LOGGER.error("Reservation ID {} not found or is deleted", reservationId);
+                    return new ReservationNotFoundException("La reserva con ID " + reservationId + " no existe");
+                });
+
+        User user = getUserByEmail(username);
+
+        // Validar que el usuario sea el guest o el host del accommodation
+        boolean isGuest = reservation.getGuest().getId().equals(user.getId());
+        boolean isHost = reservation.getAccommodation().getHost().getId().equals(user.getId());
+
+        if (!isGuest && !isHost) {
+            LOGGER.error("User {} attempted to access reservation they don't own", username);
+            throw new AccessDeniedException("No tienes permiso para ver esta reserva");
+        }
+
+        LOGGER.debug("Reservation retrieved successfully with ID: {}", reservationId);
+        return reservationMapper.toResponseDTO(reservation);
+    }
+
     /**
      * Retrieves a user by email.
      *
@@ -294,7 +330,7 @@ public class ReservationService {
      *
      * @param user The user to validate.
      * @param reservation The reservation to check permission for.
-     * @param action The action being performed (for error message).
+     * @param action The action being performed (for an error message).
      * @throws AccessDeniedException If the user does not have permission.
      */
     private void validateUserPermission(User user, Reservation reservation, String action) {
