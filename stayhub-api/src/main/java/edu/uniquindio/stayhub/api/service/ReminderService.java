@@ -61,7 +61,7 @@ public class ReminderService {
      * @param subject The subject of the email.
      * @param body The body content of the email.
      */
-    private void sendEmail(String to, String subject, String body){
+    void sendEmail(String to, String subject, String body){
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);

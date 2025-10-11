@@ -91,12 +91,13 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
 
     Optional<Accommodation> findByIdAndDeletedFalse(Long id);
 
-    @Query("SELECT a FROM Accommodation a WHERE " +
-            "(:city IS NULL OR a.city = :city) AND " +
-            "(:minCapacity IS NULL OR a.capacity >= :minCapacity) AND " +
-            "(:maxPrice IS NULL OR a.pricePerNight <= :maxPrice) AND " +
-            "a.deleted = false AND " +
-            "(:amenityIds IS EMPTY OR EXISTS (SELECT 1 FROM a.amenities am WHERE am.id IN :amenityIds))")
+    @Query("SELECT DISTINCT a FROM Accommodation a " +
+            "LEFT JOIN a.amenities am " +
+            "WHERE (:city IS NULL OR a.city = :city) " +
+            "AND (:minCapacity IS NULL OR a.capacity >= :minCapacity) " +
+            "AND (:maxPrice IS NULL OR a.pricePerNight <= :maxPrice) " +
+            "AND a.deleted = false " +
+            "AND (:amenityIds IS NULL OR am.id IN :amenityIds)")
     Page<Accommodation> findByFilters(
             @Param("city") String city,
             @Param("minCapacity") Integer minCapacity,

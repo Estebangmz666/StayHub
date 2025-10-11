@@ -78,7 +78,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 // === PUBLIC ENDPOINTS ===
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() //TODO Replace in prod
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**").permitAll() //TODO Replace in prod
 
                                 .requestMatchers(
                                         "/api/v1/users/register",

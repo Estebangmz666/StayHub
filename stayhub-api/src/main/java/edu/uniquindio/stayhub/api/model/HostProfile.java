@@ -9,8 +9,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.List;
@@ -23,8 +26,8 @@ import java.util.List;
  */
 @Entity
 @Table(name = "host_profiles")
-@Getter @Setter
-public class HostProfile {
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+public class HostProfile extends Auditable{
 
     /**
      * The unique identifier for the host profile.

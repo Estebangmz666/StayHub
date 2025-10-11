@@ -3,7 +3,9 @@ package edu.uniquindio.stayhub.api.dto.notification;
 import edu.uniquindio.stayhub.api.model.NotificationType;
 import edu.uniquindio.stayhub.api.model.NotificationStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
@@ -11,9 +13,7 @@ import java.time.LocalDateTime;
  * Data Transfer Object for returning notification details.
  * It provides a complete representation of a notification, including its metadata.
  */
-@Getter
-@Setter
-@Schema(description = "DTO for returning notification details to the client")
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Schema(description = "DTO for returning notification details to the client")
 public class NotificationResponseDTO {
 
     /**
@@ -57,4 +57,12 @@ public class NotificationResponseDTO {
      */
     @Schema(description = "The date and time when the notification was last updated", example = "2025-09-11T14:30:00")
     private LocalDateTime updatedAt;
+
+    public NotificationResponseDTO(Long notificationId, Long ownerId, NotificationType notificationType, String welcomeMessage, NotificationStatus notificationStatus, Object o) {
+        this.id = notificationId;
+        this.userId = ownerId;
+        this.notificationType = notificationType;
+        this.message = welcomeMessage;
+        this.status = notificationStatus;
+    }
 }

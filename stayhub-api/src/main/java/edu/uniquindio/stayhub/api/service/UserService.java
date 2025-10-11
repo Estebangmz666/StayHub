@@ -87,16 +87,16 @@ public class UserService implements UserDetailsService {
         return userMapper.toResponseDto(savedUser);
     }
 
-    @Transactional
-    public void changePassword(Long userId, String currentPassword, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new InvalidPasswordException("La contraseña actual es incorrecta");
-        }
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-    }
+//    @Transactional
+//    public void changePassword(Long userId, String currentPassword, String newPassword) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+//        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+//            throw new InvalidPasswordException("La contraseña actual es incorrecta");
+//        }
+//        user.setPassword(passwordEncoder.encode(newPassword));
+//        userRepository.save(user);
+//    }
 
     @Transactional
     public void requestPasswordReset(@Valid PasswordResetRequestDTO requestDTO) {
@@ -144,4 +144,15 @@ public class UserService implements UserDetailsService {
         resetToken.setUsed(true);
         passwordResetTokenRepository.save(resetToken);
     }
+
+    @Transactional(readOnly = true)
+    public UserResponseDTO getProfile(Long userId) {
+        LOGGER.info("Fetching profile for user ID: {}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+        UserResponseDTO response = userMapper.toResponseDto(user);
+        LOGGER.debug("Profile retrieved successfully for user ID: {}", userId);
+        return response;
+    }
+
 }

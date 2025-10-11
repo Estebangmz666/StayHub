@@ -5,11 +5,11 @@ package edu.uniquindio.stayhub.api.model;
  */
 public enum NotificationStatus {
     /**
-     * The notification has been viewed by the user.
+     * The user has viewed the notification.
      */
     READ,
     /**
-     * The notification has not yet been viewed by the user.
+     * The user has not yet viewed the notification.
      */
     UNREAD
 }

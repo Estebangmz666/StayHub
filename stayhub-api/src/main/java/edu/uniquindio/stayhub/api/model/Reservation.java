@@ -1,29 +1,13 @@
 package edu.uniquindio.stayhub.api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,12 +25,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_deleted", columnList = "deleted")
 })
 @AssertTrue(message = "La fecha de check-out debe ser posterior al check-in")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Reservation {
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+public class Reservation extends Auditable{
 
     /**
      * The unique identifier for the reservation.
@@ -124,30 +104,4 @@ public class Reservation {
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private boolean deleted = false;
-
-    /**
-     * The timestamp of when the reservation was created.
-     * This is automatically set and cannot be updated.
-     */
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    /**
-     * The timestamp of when the reservation was last updated.
-     * This is automatically updated on each modification.
-     */
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    /**
-     * Validation method to ensure the check-out date is after the check-in date.
-     *
-     * @return true if check-out is after check-in, false otherwise.
-     */
-    public boolean isCheckOutAfterCheckIn() {
-        if (checkInDate == null || checkOutDate == null) return true;
-        return checkOutDate.isAfter(checkInDate);
-    }
 }

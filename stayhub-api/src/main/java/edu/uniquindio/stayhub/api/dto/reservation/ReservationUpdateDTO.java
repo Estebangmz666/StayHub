@@ -3,7 +3,9 @@ package edu.uniquindio.stayhub.api.dto.reservation;
 import edu.uniquindio.stayhub.api.model.ReservationStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -12,6 +14,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "DTO for updating an existing reservation")
 public class ReservationUpdateDTO {
     /**
@@ -20,4 +24,5 @@ public class ReservationUpdateDTO {
     @NotNull(message = "Status is required")
     @Schema(description = "The updated status for the reservation", example = "CANCELED")
     private ReservationStatus status;
+
 }

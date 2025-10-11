@@ -2,8 +2,11 @@ package edu.uniquindio.stayhub.api.dto.reservation;
 
 import edu.uniquindio.stayhub.api.model.ReservationStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -16,6 +19,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "DTO for returning reservation details")
 public class ReservationResponseDTO {
 
@@ -30,6 +34,12 @@ public class ReservationResponseDTO {
      */
     @Schema(description = "The ID of the guest who made the reservation", example = "10")
     private Long guestId;
+
+    /**
+     * The accommodation title of the accommodation that was reserved.
+     */
+    @Schema(description = "The accommodation title of the accommodation that was reserved")
+    private String accommodationTitle;
 
     /**
      * The ID of the accommodation that was reserved.
@@ -78,4 +88,12 @@ public class ReservationResponseDTO {
      */
     @Schema(description = "The date and time the reservation was last updated", example = "2025-11-15T10:00:00")
     private LocalDateTime updatedAt;
+
+    public ReservationResponseDTO(Long reservationId, Long guestId, Long accommodationId, @NotBlank(message = "El título es obligatorio") @Size(max = 100, message = "El título no puede exceder 100 caracteres") String title, ReservationStatus reservationStatus, BigDecimal bigDecimal) {
+        this.id = reservationId;
+        this.guestId = guestId;
+        this.accommodationId = accommodationId;
+        this.status = reservationStatus;
+        this.totalPrice = bigDecimal;
+    }
 }

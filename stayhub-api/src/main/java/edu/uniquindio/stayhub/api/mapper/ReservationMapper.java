@@ -32,37 +32,28 @@ public interface ReservationMapper {
      * @param dto The DTO to convert.
      * @return A new {@link Reservation} entity.
      */
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "guest", ignore = true)
     @Mapping(target = "accommodation", ignore = true)
     @Mapping(target = "totalPrice", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(source = "guestId", target = "guest.id")
     Reservation toEntity(ReservationRequestDTO dto);
 
-    /**
-     * Converts a {@link Reservation} entity to a {@link ReservationResponseDTO}.
-     * <p>
-     * This mapping flattens the nested {@code guest} and {@code accommodation} objects
-     * to extract their IDs.
-     *
-     * @param reservation The entity to convert.
-     * @return A new {@link ReservationResponseDTO}.
-     */
-    @Mapping(source = "guest.id", target = "guestId")
-    @Mapping(source = "accommodation.id", target = "accommodationId")
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "checkInDate", target = "checkInDate")
-    @Mapping(source = "checkOutDate", target = "checkOutDate")
-    @Mapping(source = "numberOfGuests", target = "numberOfGuests")
-    @Mapping(source = "totalPrice", target = "totalPrice")
-    @Mapping(source = "status", target = "status")
-    @Mapping(source = "createdAt", target = "createdAt")
-    @Mapping(source = "updatedAt", target = "updatedAt")
-    ReservationResponseDTO toResponseDTO(Reservation reservation);
+    default ReservationResponseDTO toResponseDTO(Reservation reservation) {
+        if (reservation == null) return null;
+
+        ReservationResponseDTO dto = new ReservationResponseDTO();
+        dto.setId(reservation.getId());
+        dto.setGuestId(reservation.getGuest().getId());
+        dto.setAccommodationId(reservation.getAccommodation().getId());
+        dto.setCheckInDate(reservation.getCheckInDate());
+        dto.setCheckOutDate(reservation.getCheckOutDate());
+        dto.setNumberOfGuests(reservation.getNumberOfGuests());
+        dto.setTotalPrice(reservation.getTotalPrice());
+        dto.setStatus(reservation.getStatus());
+        dto.setCreatedAt(reservation.getCreatedAt());
+        dto.setUpdatedAt(reservation.getUpdatedAt());
+        return dto;
+    }
 
     /**
      * Updates an existing {@link Reservation} entity from a {@link ReservationUpdateDTO}.

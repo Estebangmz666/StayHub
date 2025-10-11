@@ -4,15 +4,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
  * Data Transfer Object for updating an existing comment.
  * This DTO contains the fields that can be modified on an existing comment.
  */
-@Getter
-@Setter
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor
 @Schema(description = "DTO for updating an existing comment")
 public class CommentUpdateDTO {
     /**

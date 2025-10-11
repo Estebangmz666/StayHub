@@ -21,7 +21,7 @@ public enum NotificationType {
      */
     RESERVATION_CREATED,
     /**
-     * A notification indicating that a reservation has been cancelled.
+     * A notification indicating that a reservation has been canceled.
      */
     RESERVATION_CANCELLED,
     /**

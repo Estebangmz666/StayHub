@@ -20,8 +20,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,7 +109,7 @@ public class AccommodationServiceTest {
 
     @Test
     @DisplayName("Should throw AccessDeniedException when a non-host user tries to create an accommodation")
-    public void createAccommodation_NonHostUser_ShouldThrowAccessDenied() throws MessagingException {
+    public void createAccommodation_NonHostUser_ShouldThrowAccessDenied() {
         // Arrange
         when(userRepository.findByEmail(guestEmail)).thenReturn(Optional.of(guestUser));
 
@@ -119,7 +124,7 @@ public class AccommodationServiceTest {
 
     @Test
     @DisplayName("Should throw AccessDeniedException when user is not found")
-    public void createAccommodation_UserNotFound_ShouldThrowAccessDenied() throws MessagingException {
+    public void createAccommodation_UserNotFound_ShouldThrowAccessDenied() {
         // Arrange
         String unknownEmail = "unknown@example.com";
         when(userRepository.findByEmail(unknownEmail)).thenReturn(Optional.empty());
@@ -166,7 +171,7 @@ public class AccommodationServiceTest {
 
     @Test
     @DisplayName("Should throw AccessDeniedException when updating with non-host user")
-    public void updateAccommodation_NonHostUser_ShouldThrowAccessDenied() throws MessagingException {
+    public void updateAccommodation_NonHostUser_ShouldThrowAccessDenied() {
         // Arrange
         when(userRepository.findByEmail(guestEmail)).thenReturn(Optional.of(guestUser));
         when(accommodationRepository.findById(accommodationId)).thenReturn(Optional.of(accommodation));
@@ -184,7 +189,7 @@ public class AccommodationServiceTest {
 
     @Test
     @DisplayName("Should throw AccommodationNotFoundException when updating non-existing accommodation")
-    public void updateAccommodation_NotFound_ShouldThrowNotFound() throws MessagingException {
+    public void updateAccommodation_NotFound_ShouldThrowNotFound() {
         // Arrange
         when(userRepository.findByEmail(hostEmail)).thenReturn(Optional.of(hostUser));
         when(accommodationRepository.findById(accommodationId)).thenReturn(Optional.empty());
@@ -221,7 +226,7 @@ public class AccommodationServiceTest {
 
     @Test
     @DisplayName("Should throw AccessDeniedException when deleting with non-host user")
-    public void deleteAccommodation_NonHostUser_ShouldThrowAccessDenied() throws MessagingException {
+    public void deleteAccommodation_NonHostUser_ShouldThrowAccessDenied() {
         // Arrange
         when(userRepository.findByEmail(guestEmail)).thenReturn(Optional.of(guestUser));
         when(accommodationRepository.findById(accommodationId)).thenReturn(Optional.of(accommodation));
@@ -238,7 +243,7 @@ public class AccommodationServiceTest {
 
     @Test
     @DisplayName("Should throw AccommodationNotFoundException when deleting non-existing accommodation")
-    public void deleteAccommodation_NotFound_ShouldThrowNotFound() throws MessagingException {
+    public void deleteAccommodation_NotFound_ShouldThrowNotFound() {
         // Arrange
         when(userRepository.findByEmail(hostEmail)).thenReturn(Optional.of(hostUser));
         when(accommodationRepository.findById(accommodationId)).thenReturn(Optional.empty());
@@ -297,5 +302,114 @@ public class AccommodationServiceTest {
         assertThatThrownBy(() -> accommodationService.updateAccommodation(accommodationId, updateDTO, "anotherhost@example.com"))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessage("No tienes permiso para update este alojamiento");
+    }
+
+    @Test
+    @DisplayName("Should return AccommodationResponseDTO when fetching existing, non-deleted accommodation")
+    public void getAccommodation_ExistingNonDeleted_ShouldReturnDTO() {
+        // Arrange
+        when(accommodationRepository.findByIdAndDeletedFalse(accommodationId)).thenReturn(Optional.of(accommodation));
+        when(accommodationMapper.toResponseDTO(accommodation)).thenReturn(responseDTO);
+
+        // Act
+        AccommodationResponseDTO result = accommodationService.getAccommodation(accommodationId);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(accommodationId);
+        verify(accommodationRepository, times(1)).findByIdAndDeletedFalse(accommodationId);
+    }
+
+    @Test
+    @DisplayName("Should throw AccommodationNotFoundException when fetching non-existing or deleted accommodation")
+    public void getAccommodation_NotFoundOrDeleted_ShouldThrowNotFound() {
+        // Arrange
+        when(accommodationRepository.findByIdAndDeletedFalse(accommodationId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> accommodationService.getAccommodation(accommodationId))
+                .isInstanceOf(AccommodationNotFoundException.class)
+                .hasMessage("El alojamiento no existe");
+        verify(accommodationRepository, times(1)).findByIdAndDeletedFalse(accommodationId);
+    }
+
+    @Test
+    @DisplayName("Should return paginated list of active accommodations")
+    public void listAccommodations_ShouldReturnPageOfDTOs() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Accommodation> accommodationList = List.of(accommodation);
+        Page<Accommodation> accommodationPage = new PageImpl<>(accommodationList, pageable, 1);
+
+        when(accommodationRepository.findAllByDeletedFalse(pageable)).thenReturn(accommodationPage);
+        when(accommodationMapper.toResponseDTO(any(Accommodation.class))).thenReturn(responseDTO);
+
+        // Act
+        Page<AccommodationResponseDTO> result = accommodationService.listAccommodations(pageable);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().getFirst().getId()).isEqualTo(accommodationId);
+        verify(accommodationRepository, times(1)).findAllByDeletedFalse(pageable);
+    }
+
+    @Test
+    @DisplayName("Should return empty page when no active accommodations are found")
+    public void listAccommodations_NoResults_ShouldReturnEmptyPage() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Accommodation> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+        when(accommodationRepository.findAllByDeletedFalse(pageable)).thenReturn(emptyPage);
+
+        // Act
+        Page<AccommodationResponseDTO> result = accommodationService.listAccommodations(pageable);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isEmpty();
+        verify(accommodationRepository, times(1)).findAllByDeletedFalse(pageable);
+        verify(accommodationMapper, never()).toResponseDTO(any());
+    }
+
+    @Test
+    @DisplayName("Should return paginated list of accommodations matching search criteria")
+    public void searchAccommodations_ValidFilters_ShouldReturnPageOfDTOs() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        String city = "Medellin";
+        Integer minCapacity = 4;
+        BigDecimal maxPrice = BigDecimal.valueOf(200000);
+        List<Long> amenityIds = List.of(1L, 2L);
+
+        List<Accommodation> accommodationList = List.of(accommodation);
+        Page<Accommodation> searchPage = new PageImpl<>(accommodationList, pageable, 1);
+
+        when(accommodationRepository.findByFilters(city, minCapacity, maxPrice, amenityIds, pageable))
+                .thenReturn(searchPage);
+        when(accommodationMapper.toResponseDTO(any(Accommodation.class))).thenReturn(responseDTO);
+
+        // Act
+        Page<AccommodationResponseDTO> result = accommodationService.searchAccommodations(city, minCapacity, maxPrice, amenityIds, pageable);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
+        verify(accommodationRepository, times(1)).findByFilters(city, minCapacity, maxPrice, amenityIds, pageable);
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when amenityIds contains null values")
+    public void searchAccommodations_NullAmenityId_ShouldThrowException() {
+        // Arrange
+        List<Long> amenityIdsWithNull = List.of(1L, null, 2L);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // Act & Assert
+        assertThatThrownBy(() -> accommodationService.searchAccommodations("City", 2, BigDecimal.TEN, amenityIdsWithNull, pageable))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Las listas de IDs de amenidades no pueden contener valores nulos");
+        verify(accommodationRepository, never()).findByFilters(any(), any(), any(), any(), any());
     }
 }

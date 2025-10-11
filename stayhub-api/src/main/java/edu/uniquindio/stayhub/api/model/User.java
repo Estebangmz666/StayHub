@@ -39,7 +39,7 @@ import java.util.List;
         @Index(name = "idx_deleted", columnList = "deleted")
 })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class User {
+public class User extends Auditable{
 
     /**
      * The unique identifier for the user.
@@ -132,4 +132,9 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
+
+    public User(String name, String email){
+        this.name = name;
+        this.email = email;
+    }
 }

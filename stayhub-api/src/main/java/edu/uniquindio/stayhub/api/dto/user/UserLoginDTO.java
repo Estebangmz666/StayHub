@@ -3,13 +3,14 @@ package edu.uniquindio.stayhub.api.dto.user;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Data Transfer Object for user login credentials.
  */
-@Data
-@Schema(description = "DTO for user login credentials")
+@Data @NoArgsConstructor @AllArgsConstructor @Schema(description = "DTO for user login credentials")
 public class UserLoginDTO {
 
     /**

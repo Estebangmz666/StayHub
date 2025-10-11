@@ -2,7 +2,9 @@ package edu.uniquindio.stayhub.api.dto.user;
 
 import edu.uniquindio.stayhub.api.model.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -12,9 +14,7 @@ import java.util.List;
  * Data Transfer Object for returning user details to the client.
  * This DTO provides a complete representation of a user's profile.
  */
-@Getter
-@Setter
-@Schema(description = "DTO for returning user details")
+@Getter@Setter@AllArgsConstructor@NoArgsConstructor @Schema(description = "DTO for returning user details")
 public class UserResponseDTO {
 
     /**
@@ -70,4 +70,11 @@ public class UserResponseDTO {
      */
     @Schema(description = "A list of URLs to legal documents, specific to hosts", example = "[\"https://example.com/legal/doc1.pdf\"]")
     private List<String> legalDocuments;
+
+    public UserResponseDTO(Long userId, String name, String email, Role role, Object o) {
+        this.id = userId;
+        this.name = name;
+        this.email = email;
+        this.role = role;
+    }
 }

@@ -191,4 +191,9 @@ public class Accommodation {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public Accommodation(String title, User host) {
+        this.title = title;
+        this.host = host;
+    }
 }

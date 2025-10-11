@@ -17,10 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Entity representing a notification in the StayHub application.
@@ -33,8 +30,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_deleted", columnList = "deleted")
 })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-@Builder
-public class Notification {
+@SuperBuilder
+public class Notification extends Auditable{
 
     /**
      * The unique identifier for the notification.
@@ -81,20 +78,4 @@ public class Notification {
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private boolean deleted = false;
-
-    /**
-     * The timestamp when the notification was created.
-     * This field is automatically populated on creation.
-     */
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    /**
-     * The timestamp when the notification was last updated.
-     * This field is automatically updated on each modification.
-     */
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 }

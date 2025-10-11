@@ -1,26 +1,13 @@
 package edu.uniquindio.stayhub.api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -35,8 +22,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_accommodation_id", columnList = "accommodation_id"),
         @Index(name = "idx_deleted", columnList = "deleted")
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Comment {
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+public class Comment extends Auditable{
 
     /**
      * The unique identifier for the comment.
@@ -79,12 +66,18 @@ public class Comment {
     private Integer rating;
 
     /**
-     * The timestamp when the comment was created.
+     * The Host reply to a Comment
+     */
+    @Column
+    @NotNull(message = "La respuesta debe tener contenido")
+    private String hostReplyText;
+
+    /**
+     * The date when the host replied to the comment
      */
     @Column(nullable = false)
-    @NotNull(message = "La fecha del comentario es obligatoria")
-    @PastOrPresent(message = "La fecha del comentario debe ser en el pasado o presente")
-    private LocalDateTime createdAt;
+    @NotNull
+    private LocalDateTime replyDate;
 
     /**
      * A flag indicating whether the comment has been soft-deleted.
@@ -92,14 +85,4 @@ public class Comment {
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private boolean deleted = false;
-
-    /**
-     * Lifecycle method that sets the creation timestamp and the deleted flag
-     * to their default values before the entity is persisted.
-     */
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.deleted = false;
-    }
 }

@@ -9,7 +9,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
 import org.mapstruct.AfterMapping;
@@ -20,11 +22,9 @@ import java.util.List;
 
 /**
  * Data Transfer Object for updating a user's profile.
- * This DTO allows for modifying user details, and includes fields specific to hosts.
+ * This DTO allows for modifying user details and includes fields specific to hosts.
  */
-@Getter
-@Setter
-@Schema(description = "DTO for updating a user's profile")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Schema(description = "DTO for updating a user's profile")
 public class UpdateProfileDTO {
 
     /**
@@ -73,6 +73,12 @@ public class UpdateProfileDTO {
     @Valid
     @Schema(description = "A list of URLs to legal documents, required for host verification", example = "[\"https://example.com/legal/document1.pdf\", \"https://example.com/legal/document2.pdf\"]")
     private List<@URL(message = "Cada documento legal debe tener una url válida") String> legalDocuments;
+
+    public UpdateProfileDTO(String name, @org.jetbrains.annotations.Nullable String description, String phoneNumber, Object o, Object o1) {
+        this.name = name;
+        this.description = description;
+        this.phoneNumber = phoneNumber;
+    }
 
     @AfterMapping
     void mapHostProfile(@MappingTarget User user, UpdateProfileDTO dto) {

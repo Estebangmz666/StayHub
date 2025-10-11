@@ -1,8 +1,11 @@
 package edu.uniquindio.stayhub.api.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +18,8 @@ import java.time.LocalDateTime;
 @Table(name = "password_reset_tokens", indexes = {
         @Index(name = "idx_token", columnList = "token")
 })
-@Getter @Setter
-public class PasswordResetToken {
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+public class PasswordResetToken extends Auditable{
     /**
      * The unique identifier for the password reset token.
      */

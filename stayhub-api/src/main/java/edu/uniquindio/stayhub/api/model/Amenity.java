@@ -3,17 +3,20 @@ package edu.uniquindio.stayhub.api.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Entity representing an amenity (service or feature) of an accommodation.
+ * Entity representing an amenity (service or feature) of accommodation.
  * This class maps to the 'amenities' table in the database.
  */
 @Entity
 @Table(name = "amenities")
-@Getter @Setter
-public class Amenity {
+@Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
+public class Amenity extends Auditable{
     /**
      * The unique identifier for the amenity.
      */

@@ -26,12 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User Management", description = "Endpoints for user registration, authentication, and profile management")
 @RestController
@@ -154,5 +149,24 @@ public class UserController {
         userService.resetPassword(resetDTO);
         LOGGER.debug("Password reset successfully");
         return new ResponseEntity<>(new SuccessResponseDTO("Password reset successfully"), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get user profile", description = "Retrieves the profile information of the authenticated user")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class),
+                            examples = @ExampleObject(value = "{\"id\": 1, \"email\": \"user@example.com\", \"name\": \"Juan Perez\", \"phoneNumber\": \"+573001234567\", \"birthDate\": \"1990-05-15\", \"role\": \"GUEST\", \"profilePicture\": \"https://example.com/photo.jpg\", \"description\": null, \"legalDocuments\": null}"))),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = edu.uniquindio.stayhub.api.dto.auth.Error.class),
+                            examples = @ExampleObject(value = "{\"message\": \"User not found\", \"code\": 404}")))
+    })
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponseDTO> getProfile(
+            @RequestHeader("X-User-Id") @Parameter(description = "User ID", required = true) Long userId) {
+        LOGGER.info("Fetching profile for user ID: {}", userId);
+        UserResponseDTO response = userService.getProfile(userId);
+        LOGGER.debug("Profile fetched successfully for user ID: {}", userId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

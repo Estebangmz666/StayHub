@@ -3,7 +3,9 @@ package edu.uniquindio.stayhub.api.dto.user;
 import edu.uniquindio.stayhub.api.model.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -12,9 +14,7 @@ import java.time.LocalDate;
  * Data Transfer Object for user registration.
  * This DTO contains all the necessary information to create a new user account.
  */
-@Getter
-@Setter
-@Schema(description = "DTO for user registration")
+@Getter@Setter@NoArgsConstructor @AllArgsConstructor @Schema(description = "DTO for user registration")
 public class UserRegistrationDTO {
 
     /**
@@ -51,7 +51,7 @@ public class UserRegistrationDTO {
     private String phoneNumber;
 
     /**
-     * The user's birth date.
+     * The user's birthdate.
      */
     @NotNull(message = "Birth date is required")
     @Past(message = "Birth date must be in the past")
@@ -64,4 +64,11 @@ public class UserRegistrationDTO {
     @NotNull(message = "Role is required")
     @Schema(description = "The role of the user", example = "GUEST")
     private Role role;
+
+    public UserRegistrationDTO(String name, String email, String rawPassword, Role role) {
+        this.name = name;
+        this.email = email;
+        this.password = rawPassword;
+        this.role = role;
+    }
 }

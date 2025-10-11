@@ -12,7 +12,6 @@ import edu.uniquindio.stayhub.api.model.NotificationStatus;
 import edu.uniquindio.stayhub.api.model.User;
 import edu.uniquindio.stayhub.api.repository.NotificationRepository;
 import edu.uniquindio.stayhub.api.repository.UserRepository;
-import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -53,7 +52,7 @@ public class NotificationService {
      * @param requestDTO The notification creation details.
      * @throws UserNotFoundException If the user does not exist.
      */
-    public void createNotification(@Valid NotificationRequestDTO requestDTO) throws MessagingException {
+    public void createNotification(@Valid NotificationRequestDTO requestDTO){
         LOGGER.info("Creating notification for user ID: {}", requestDTO.getUserId());
         User user = getUserById(requestDTO.getUserId());
 
@@ -79,7 +78,6 @@ public class NotificationService {
      */
     public List<NotificationResponseDTO> getNotificationsByUser(Long userId, String username, String status) {
         LOGGER.info("Retrieving notifications for user ID: {}, requested by: {}", userId, username);
-        User user = getUserById(userId);
         User authenticatedUser = getUserByEmail(username);
         if (!authenticatedUser.getId().equals(userId)) {
             LOGGER.error("User {} does not have permission to view notifications for user ID: {}", username, userId);
