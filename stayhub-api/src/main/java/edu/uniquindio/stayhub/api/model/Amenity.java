@@ -37,4 +37,12 @@ public class Amenity extends Auditable{
      */
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean isActive;
+
+    /**
+     * The description of the amenity.
+     */
+    @Column(nullable = false)
+    @NotBlank(message = "La descripción del servicio es obligatoria")
+    @Size(max = 200, message = "La descripción no puede exceder 200 caracteres")
+    private String description;
 }

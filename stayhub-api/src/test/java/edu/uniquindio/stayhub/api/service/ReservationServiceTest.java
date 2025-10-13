@@ -130,15 +130,19 @@ public class ReservationServiceTest {
     @DisplayName("Should create reservation successfully and send two notifications")
     void createReservation_Success() throws MessagingException {
         // Arrange
-        // Mocks comunes
         when(userRepository.findByEmail(guestEmail)).thenReturn(Optional.of(guestUser));
         when(accommodationRepository.findById(accommodationId)).thenReturn(Optional.of(accommodation));
         when(reservationRepository.existsOverlappingReservations(anyLong(), any(), any())).thenReturn(false);
 
-        // Mocks para la creación
         when(reservationMapper.toEntity(requestDTO)).thenReturn(reservation);
         when(reservationRepository.save(reservation)).thenReturn(reservation);
+
+        ReservationResponseDTO responseDTO = new ReservationResponseDTO();
+        responseDTO.setId(reservationId);
+        responseDTO.setAccommodationTitle(accommodation.getTitle());
+
         when(reservationMapper.toResponseDTO(reservation)).thenReturn(responseDTO);
+
         doNothing().when(notificationService).createNotification(any(NotificationRequestDTO.class));
 
         // Act
@@ -147,10 +151,11 @@ public class ReservationServiceTest {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getAccommodationTitle()).isEqualTo(accommodation.getTitle());
+        assertThat(result.getId()).isEqualTo(reservationId);
         verify(reservationRepository, times(1)).save(reservation);
-        // Debe notificar al huésped y al anfitrión
         verify(notificationService, times(2)).createNotification(any(NotificationRequestDTO.class));
     }
+
 
     @Test
     @DisplayName("Should throw AccessDeniedException if authenticated user is not a GUEST")

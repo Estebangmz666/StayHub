@@ -52,6 +52,9 @@ public interface ReservationMapper {
         dto.setStatus(reservation.getStatus());
         dto.setCreatedAt(reservation.getCreatedAt());
         dto.setUpdatedAt(reservation.getUpdatedAt());
+        if (reservation.getAccommodation() != null) {
+            dto.setAccommodationTitle(reservation.getAccommodation().getTitle());
+        }
         return dto;
     }
 

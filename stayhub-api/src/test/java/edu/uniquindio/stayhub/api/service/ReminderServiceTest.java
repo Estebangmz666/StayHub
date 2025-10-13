@@ -50,12 +50,6 @@ public class ReminderServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 1. Configuración de la fecha (mañana)
-        // Usamos doAnswer para interceptar la llamada al método privado 'sendEmail'
-        // Esto evita que intentemos mockear SimpleMailMessage y JavaMailSender.send()
-        // Además, el @Spy nos permite verificar la llamada al método privado.
-        doNothing().when(reminderService).sendEmail(anyString(), anyString(), anyString());
-
         // Simular 'mañana' (la fecha de búsqueda) para el test
         tomorrow = LocalDateTime.now().plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
 
@@ -90,6 +84,8 @@ public class ReminderServiceTest {
     @DisplayName("Should send two emails (guest and host) for one upcoming reservation")
     void sendCheckInReminders_OneReservation_SendsTwoEmails() {
         // Arrange
+        doNothing().when(reminderService).sendEmail(anyString(), anyString(), anyString());
+
         List<Reservation> upcomingReservations = List.of(mockReservation);
 
         // Mockear la respuesta del repositorio. Usamos any() porque la fecha exacta de 'tomorrow'
@@ -127,6 +123,8 @@ public class ReminderServiceTest {
     @DisplayName("Should send four emails for two upcoming reservations")
     void sendCheckInReminders_TwoReservations_SendsFourEmails() {
         // Arrange
+        doNothing().when(reminderService).sendEmail(anyString(), anyString(), anyString());
+
         Reservation secondReservation = new Reservation();
         secondReservation.setGuest(new User("Carlos", "carlos@guest.com"));
         secondReservation.setAccommodation(new Accommodation("Apartamento Central", host));
@@ -148,6 +146,8 @@ public class ReminderServiceTest {
     @DisplayName("Should not send any email if no upcoming reservations are found")
     void sendCheckInReminders_NoReservations_SendsZeroEmails() {
         // Arrange
+        // Don't stub sendEmail here since it won't be called
+
         when(reservationRepository.findByCheckInDate(any(LocalDateTime.class))).thenReturn(Collections.emptyList());
 
         // Act

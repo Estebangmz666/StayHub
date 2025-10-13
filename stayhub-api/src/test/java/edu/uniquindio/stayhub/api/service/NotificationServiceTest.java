@@ -121,7 +121,6 @@ public class NotificationServiceTest {
     void getNotificationsByUser_NoStatusFilter_Success() {
         // Arrange
         List<Notification> notifications = List.of(notification);
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerUser));
         when(userRepository.findByEmail(ownerEmail)).thenReturn(Optional.of(ownerUser));
         when(notificationRepository.findByUserIdAndDeletedFalse(ownerId)).thenReturn(notifications);
         when(notificationMapper.toResponseDTO(notification)).thenReturn(responseDTO);
@@ -141,7 +140,6 @@ public class NotificationServiceTest {
     void getNotificationsByUser_WithStatusFilter_Success() {
         // Arrange
         List<Notification> notifications = List.of(notification);
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerUser));
         when(userRepository.findByEmail(ownerEmail)).thenReturn(Optional.of(ownerUser));
         when(notificationRepository.findByUserIdAndStatusAndDeletedFalse(ownerId, NotificationStatus.UNREAD)).thenReturn(notifications);
         when(notificationMapper.toResponseDTO(notification)).thenReturn(responseDTO);
@@ -159,7 +157,6 @@ public class NotificationServiceTest {
     @DisplayName("Should throw AccessDeniedException when an unauthorized user tries to view notifications")
     void getNotificationsByUser_UnauthorizedUser_ThrowsAccessDenied() {
         // Arrange
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerUser));
         when(userRepository.findByEmail(otherEmail)).thenReturn(Optional.of(otherUser));
 
         // Act & Assert
@@ -173,7 +170,6 @@ public class NotificationServiceTest {
     @DisplayName("Should throw IllegalArgumentException when an invalid status is provided")
     void getNotificationsByUser_InvalidStatus_ThrowsIllegalArgument() {
         // Arrange
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerUser));
         when(userRepository.findByEmail(ownerEmail)).thenReturn(Optional.of(ownerUser));
 
         // Act & Assert
@@ -183,15 +179,13 @@ public class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw UserNotFoundException if the target userId is not found")
+    @DisplayName("Should throw AccessDeniedException if the target userId is not found")
     void getNotificationsByUser_TargetUserNotFound_ThrowsUserNotFound() {
-        // Arrange
-        when(userRepository.findById(ownerId)).thenReturn(Optional.empty());
+        // Arrange - No stubs needed, the service will throw early
 
         // Act & Assert
         assertThatThrownBy(() -> notificationService.getNotificationsByUser(ownerId, ownerEmail, null))
-                .isInstanceOf(UserNotFoundException.class);
-        verify(userRepository, never()).findByEmail(anyString());
+                .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test

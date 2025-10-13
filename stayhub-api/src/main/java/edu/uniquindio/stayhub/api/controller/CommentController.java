@@ -27,7 +27,7 @@ import java.util.List;
  * as well as calculating average ratings and comment counts for accommodations.
  */
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api/v1/comments")
 @Tag(name = "Comment Management", description = "Operations related to accommodation reviews")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor

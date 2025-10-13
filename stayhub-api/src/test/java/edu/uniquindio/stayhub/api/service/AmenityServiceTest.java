@@ -52,7 +52,7 @@ public class AmenityServiceTest {
         amenity.setName("Piscina");
         amenity.setActive(true);
 
-        amenityDTO = new AmenityDTO(amenityId, "Piscina", true);
+        amenityDTO = new AmenityDTO("Piscina", "Piscina grande pa nadar");
     }
 
     @Test
@@ -92,7 +92,7 @@ public class AmenityServiceTest {
     @DisplayName("Should create and return a new amenity successfully")
     void createAmenity_Success() {
         // Arrange
-        AmenityDTO newAmenityDTO = new AmenityDTO(null, "Jacuzzi", true);
+        AmenityDTO newAmenityDTO = new AmenityDTO("Jacuzzi","Jacuzzi grande");
         Amenity newAmenity = new Amenity();
         newAmenity.setName("Jacuzzi");
 
@@ -101,7 +101,7 @@ public class AmenityServiceTest {
         savedAmenity.setName("Jacuzzi");
         savedAmenity.setActive(true);
 
-        AmenityDTO savedAmenityDTO = new AmenityDTO(2L, "Jacuzzi", true);
+        AmenityDTO savedAmenityDTO = new AmenityDTO("Jacuzzi","Jacuzzi grande");
 
         when(amenityRepository.existsByName(newAmenityDTO.getName())).thenReturn(false);
         when(amenityMapper.toEntity(newAmenityDTO)).thenReturn(newAmenity);
@@ -112,7 +112,6 @@ public class AmenityServiceTest {
         AmenityDTO result = amenityService.createAmenity(newAmenityDTO);
 
         // Assert
-        assertThat(result.getId()).isEqualTo(2L);
         assertThat(result.getName()).isEqualTo("Jacuzzi");
         assertThat(newAmenity.isActive()).isTrue();
         verify(amenityRepository, times(1)).save(newAmenity);
@@ -135,7 +134,7 @@ public class AmenityServiceTest {
     @DisplayName("Should update amenity name and active status successfully")
     void updateAmenity_Success() {
         // Arrange
-        AmenityDTO updatedDTO = new AmenityDTO(amenityId, "Piscina Nueva", false);
+        AmenityDTO updatedDTO = new AmenityDTO("Piscina Nueva", "Piscina grande");
         Amenity updatedEntity = new Amenity();
         updatedEntity.setId(amenityId);
         updatedEntity.setName("Piscina Nueva");
@@ -151,7 +150,6 @@ public class AmenityServiceTest {
 
         // Assert
         assertThat(result.getName()).isEqualTo("Piscina Nueva");
-        assertThat(result.isActive()).isFalse();
         verify(amenityRepository, times(1)).save(amenity);
     }
 
@@ -176,7 +174,7 @@ public class AmenityServiceTest {
         anotherAmenity.setId(2L);
         anotherAmenity.setName("Gimnasio"); // Name that already exists
 
-        AmenityDTO conflictDTO = new AmenityDTO(amenityId, "Gimnasio", true);
+        AmenityDTO conflictDTO = new AmenityDTO("Gimnasio", "Gimnasio grande");
 
         when(amenityRepository.findById(amenityId)).thenReturn(Optional.of(amenity)); // Original name: Piscina
         when(amenityRepository.existsByName("Gimnasio")).thenReturn(true); // Conflict found
@@ -230,8 +228,6 @@ public class AmenityServiceTest {
         AmenityDTO result = amenityService.getAmenityById(amenityId);
 
         // Assert
-        assertThat(result.getId()).isEqualTo(amenityId);
-        assertThat(result.isActive()).isTrue();
         verify(amenityRepository, times(1)).findById(amenityId);
     }
 

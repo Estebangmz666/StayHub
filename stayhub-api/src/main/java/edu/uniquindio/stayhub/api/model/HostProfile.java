@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.validator.constraints.URL;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class HostProfile extends Auditable{
      */
     @ElementCollection
     @Column
-    @URL(message = "Cada documento debe tener una URL válida")
+    @Size(min = 1, message = "Debe haber al menos un documento legal")
     private List<String> legalDocuments;
 
     /**

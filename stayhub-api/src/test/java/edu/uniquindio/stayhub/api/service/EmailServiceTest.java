@@ -2,26 +2,35 @@ package edu.uniquindio.stayhub.api.service;
 
 import edu.uniquindio.stayhub.api.dto.notification.NotificationRequestDTO;
 import edu.uniquindio.stayhub.api.model.NotificationType;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.util.Map;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
 
+    @Mock
+    private JavaMailSender mailSender;
 
+    @Mock
+    private TemplateEngine templateEngine;
 
     // Usamos Spy para interceptar la llamada al método privado sendEmailWithTemplate
     @Spy
@@ -42,25 +51,16 @@ public class EmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Inyectar los campos @Value usando ReflectionTestUtils
+        // Inyectar los campos @Value simulados
         ReflectionTestUtils.setField(emailService, "frontendUrl", FRONTEND_URL);
-        String DEFAULT_FROM = "noreply@stayhub.com";
-        ReflectionTestUtils.setField(emailService, "defaultFrom", DEFAULT_FROM);
+        ReflectionTestUtils.setField(emailService, "defaultFrom", "noreply@stayhub.com");
 
-        // Usar doNothing para evitar la ejecución real del método sendEmailWithTemplate,
-        // pero capturar sus argumentos para la verificación.
-        // Nota: Esta técnica verifica la invocación de un método dentro de un Spy.
-        try {
-            Mockito.doAnswer(invocation -> {
-                toCaptor.capture();
-                subjectCaptor.capture();
-                templateNameCaptor.capture();
-                variablesCaptor.capture();
-                return null;
-            }).when(emailService).sendEmailWithTemplate(toCaptor.capture(), subjectCaptor.capture(), templateNameCaptor.capture(), variablesCaptor.capture());
-        } catch (Exception e) {
-            // Manejar la excepción de stubbing, si es necesario, aunque el doAnswer/when debería funcionar
-        }
+        MimeMessage mimeMessage = new MimeMessage(Session.getInstance(new Properties()));
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        // Configure TemplateEngine to return mock HTML content
+        when(templateEngine.process(anyString(), any(Context.class)))
+                .thenReturn("<html><body>Mock email content</body></html>");
     }
 
     // ----------------------------------------------------------------------
@@ -79,10 +79,15 @@ public class EmailServiceTest {
         emailService.sendPasswordResetEmail(email, token);
 
         // Assert
-        // 1. Verificación de la llamada al método interno
-        verify(emailService, times(1)).sendEmailWithTemplate(anyString(), anyString(), anyString(), anyMap());
+        // Verify and capture the arguments in one call
+        verify(emailService, times(1)).sendEmailWithTemplate(
+                toCaptor.capture(),
+                subjectCaptor.capture(),
+                templateNameCaptor.capture(),
+                variablesCaptor.capture()
+        );
 
-        // 2. Verificación de los argumentos capturados
+        // Verify the captured arguments
         assertThat(toCaptor.getValue()).isEqualTo(email);
         assertThat(subjectCaptor.getValue()).isEqualTo("StayHub - Restablecer Contraseña");
         assertThat(templateNameCaptor.getValue()).isEqualTo("emails/password-reset");
@@ -113,11 +118,14 @@ public class EmailServiceTest {
         // Act
         emailService.sendEmailNotification(notificationDTO, recipientEmail);
 
-        // Assert
-        // 1. Verificación de la llamada
-        verify(emailService, times(1)).sendEmailWithTemplate(anyString(), anyString(), anyString(), anyMap());
+        // Assert: capturar los argumentos
+        verify(emailService).sendEmailWithTemplate(
+                toCaptor.capture(),
+                subjectCaptor.capture(),
+                templateNameCaptor.capture(),
+                variablesCaptor.capture()
+        );
 
-        // 2. Verificación de los argumentos (Subject y TemplateName dependen del tipo)
         assertThat(toCaptor.getValue()).isEqualTo(recipientEmail);
         assertThat(subjectCaptor.getValue()).isEqualTo("Confirmación de Reserva en StayHub");
         assertThat(templateNameCaptor.getValue()).isEqualTo("emails/reservation-confirmed");
@@ -135,7 +143,7 @@ public class EmailServiceTest {
         String message = "A general update message.";
         NotificationRequestDTO notificationDTO = new NotificationRequestDTO(
                 1L,
-                NotificationType.ACCOMMODATION_CREATED, // No está en los switch case
+                NotificationType.ACCOMMODATION_CREATED, // no está en switch
                 message,
                 null
         );
@@ -144,13 +152,18 @@ public class EmailServiceTest {
         emailService.sendEmailNotification(notificationDTO, recipientEmail);
 
         // Assert
-        // 1. Verificación de la llamada
-        verify(emailService, times(1)).sendEmailWithTemplate(anyString(), anyString(), anyString(), anyMap());
+        // Capturamos los argumentos reales usados en el método interno
+        verify(emailService, times(1)).sendEmailWithTemplate(
+                toCaptor.capture(),
+                subjectCaptor.capture(),
+                templateNameCaptor.capture(),
+                variablesCaptor.capture()
+        );
 
-        // 2. Verificación de los argumentos (Debe usar los valores por defecto)
+        // Ahora sí comparamos
         assertThat(toCaptor.getValue()).isEqualTo(recipientEmail);
-        assertThat(subjectCaptor.getValue()).isEqualTo("Notificación de StayHub"); // Subject por defecto
-        assertThat(templateNameCaptor.getValue()).isEqualTo("emails/notification"); // Template por defecto
+        assertThat(subjectCaptor.getValue()).isEqualTo("Notificación de StayHub"); // default
+        assertThat(templateNameCaptor.getValue()).isEqualTo("emails/notification"); // default
 
         Map<String, Object> variables = variablesCaptor.getValue();
         assertThat(variables.get("message")).isEqualTo(message);

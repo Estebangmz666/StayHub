@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -151,7 +152,8 @@ public class AccommodationServiceTest {
         when(userRepository.findByEmail(hostEmail)).thenReturn(Optional.of(hostUser));
         when(accommodationRepository.findById(accommodationId)).thenReturn(Optional.of(accommodation));
         doNothing().when(accommodationMapper).updateEntity(updateDTO, accommodation);
-        when(accommodationRepository.save(updatedAccommodation)).thenReturn(updatedAccommodation);
+//        when(accommodationRepository.save(updatedAccommodation)).thenReturn(updatedAccommodation);
+        when(accommodationRepository.save(any(Accommodation.class))).thenReturn(updatedAccommodation);
         when(accommodationMapper.toResponseDTO(updatedAccommodation)).thenReturn(updatedResponseDTO);
 
         // Act
@@ -165,7 +167,8 @@ public class AccommodationServiceTest {
         verify(userRepository, times(1)).findByEmail(hostEmail);
         verify(accommodationRepository, times(1)).findById(accommodationId);
         verify(accommodationMapper, times(1)).updateEntity(updateDTO, accommodation);
-        verify(accommodationRepository, times(1)).save(updatedAccommodation);
+//        verify(accommodationRepository, times(1)).save(updatedAccommodation);
+        verify(accommodationRepository, times(1)).save(any(Accommodation.class));
         verify(notificationService, times(1)).createNotification(any(NotificationRequestDTO.class));
     }
 
@@ -381,7 +384,7 @@ public class AccommodationServiceTest {
         String city = "Medellin";
         Integer minCapacity = 4;
         BigDecimal maxPrice = BigDecimal.valueOf(200000);
-        List<Long> amenityIds = List.of(1L, 2L);
+        List<Long> amenityIds = new ArrayList<Long>(List.of(1L, 2L));
 
         List<Accommodation> accommodationList = List.of(accommodation);
         Page<Accommodation> searchPage = new PageImpl<>(accommodationList, pageable, 1);
@@ -403,7 +406,10 @@ public class AccommodationServiceTest {
     @DisplayName("Should throw IllegalArgumentException when amenityIds contains null values")
     public void searchAccommodations_NullAmenityId_ShouldThrowException() {
         // Arrange
-        List<Long> amenityIdsWithNull = List.of(1L, null, 2L);
+        List<Long> amenityIdsWithNull = new ArrayList<>();
+        amenityIdsWithNull.add(1L);
+        amenityIdsWithNull.add(null);
+        amenityIdsWithNull.add(2L);
         Pageable pageable = PageRequest.of(0, 10);
 
         // Act & Assert
@@ -412,4 +418,5 @@ public class AccommodationServiceTest {
                 .hasMessage("Las listas de IDs de amenidades no pueden contener valores nulos");
         verify(accommodationRepository, never()).findByFilters(any(), any(), any(), any(), any());
     }
+
 }

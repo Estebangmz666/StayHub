@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -89,21 +91,19 @@ public class AccommodationService {
      */
     public AccommodationResponseDTO updateAccommodation(Long accommodationId, AccommodationUpdateDTO updateDTO, String username) throws MessagingException {
         LOGGER.info("Updating accommodation ID: {} for user: {}", accommodationId, username);
-        Accommodation accommodation = getAccommodationById(accommodationId);
         User user = getUserByEmail(username);
+        Accommodation accommodation = getAccommodationById(accommodationId);
         validateHostAndOwnership(user, accommodation, "update");
         accommodationMapper.updateEntity(updateDTO, accommodation);
         Accommodation updatedAccommodation = accommodationRepository.save(accommodation);
         LOGGER.debug("Accommodation ID: {} updated", accommodationId);
 
-        // Send notification to host
         notificationService.createNotification(new NotificationRequestDTO(
                 user.getId(),
                 NotificationType.ACCOMMODATION_UPDATED,
                 "Your accommodation " + accommodation.getTitle() + " has been updated successfully!",
                 NotificationStatus.UNREAD
         ));
-
         return accommodationMapper.toResponseDTO(updatedAccommodation);
     }
 
@@ -117,14 +117,13 @@ public class AccommodationService {
      */
     public void deleteAccommodation(Long accommodationId, String username) throws MessagingException {
         LOGGER.info("Deleting accommodation ID: {} for user: {}", accommodationId, username);
-        Accommodation accommodation = getAccommodationById(accommodationId);
         User user = getUserByEmail(username);
+        Accommodation accommodation = getAccommodationById(accommodationId);
         validateHostAndOwnership(user, accommodation, "delete");
         accommodation.setDeleted(true);
         accommodationRepository.save(accommodation);
         LOGGER.debug("Accommodation ID: {} deleted", accommodationId);
 
-        // Send notification to host
         notificationService.createNotification(new NotificationRequestDTO(
                 user.getId(),
                 NotificationType.ACCOMMODATION_DELETED,
@@ -203,24 +202,27 @@ public class AccommodationService {
         return accommodationMapper.toResponseDTO(accommodation);
     }
 
-    public Page<AccommodationResponseDTO> searchAccommodations(String city,
-                                                               @Positive Integer minCapacity,
-                                                               @Positive BigDecimal maxPrice,
-                                                               List<Long> amenityIds,
-                                                               Pageable pageable) {
+    public Page<AccommodationResponseDTO> searchAccommodations(
+            String city,
+            @Positive Integer minCapacity,
+            @Positive BigDecimal maxPrice,
+            List<Long> amenityIds,
+            Pageable pageable) {
+
         LOGGER.info("Searching accommodations with filters: city={}, minCapacity={}, maxPrice={}, amenityIds={}",
                 city, minCapacity, maxPrice, amenityIds);
 
         if (amenityIds != null && amenityIds.contains(null)) {
-            LOGGER.error("Amenity IDs cannot contain null values");
             throw new IllegalArgumentException("Las listas de IDs de amenidades no pueden contener valores nulos");
         }
+
+        List<Long> safeAmenityIds = amenityIds == null ? Collections.emptyList() : new ArrayList<>(amenityIds);
 
         Page<Accommodation> result = accommodationRepository.findByFilters(
                 city,
                 minCapacity,
                 maxPrice,
-                amenityIds,
+                safeAmenityIds.isEmpty() ? null : safeAmenityIds, // pasar null si está vacía, según cómo lo manejes en el query
                 pageable
         );
 
@@ -228,4 +230,5 @@ public class AccommodationService {
 
         return result.map(accommodationMapper::toResponseDTO);
     }
+
 }

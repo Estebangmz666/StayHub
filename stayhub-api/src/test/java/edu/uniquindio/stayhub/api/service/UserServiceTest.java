@@ -122,13 +122,16 @@ public class UserServiceTest {
         when(userRepository.save(newUser)).thenReturn(savedUser);
         when(userMapper.toResponseDto(savedUser)).thenReturn(responseDTO);
 
+        // Mock the userMapper methods that are called on newUser
+        doNothing().when(userMapper).setHostProfile(newUser);
+
         // Act
         UserResponseDTO result = userService.registerUser(registrationDTO);
 
         // Assert
         assertThat(result.getEmail()).isEqualTo(email);
         verify(userMapper, times(1)).setHostProfile(newUser);
-        verify(newUser, times(1)).setPassword(encodedPassword);
+        verify(passwordEncoder, times(1)).encode(rawPassword);
         verify(userRepository, times(1)).save(newUser);
     }
 

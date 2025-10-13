@@ -27,7 +27,7 @@ public class AmenityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmenityService.class);
     private final AmenityRepository amenityRepository;
-    private final AmenityMapper amenityMapper = AmenityMapper.INSTANCE;
+    private final AmenityMapper amenityMapper;
 
     /**
      * Retrieves all active amenities.
@@ -81,7 +81,6 @@ public class AmenityService {
         }
 
         existing.setName(amenityDTO.getName());
-        existing.setActive(amenityDTO.isActive());
 
         Amenity updated = amenityRepository.save(existing);
         LOGGER.debug("Amenity updated successfully: {}", updated.getName());
