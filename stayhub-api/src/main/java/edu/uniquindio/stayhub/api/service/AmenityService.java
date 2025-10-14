@@ -1,6 +1,8 @@
 package edu.uniquindio.stayhub.api.service;
 
-import edu.uniquindio.stayhub.api.dto.accommodation.AmenityDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityRequestDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityResponseDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityUpdateDTO;
 import edu.uniquindio.stayhub.api.exception.AmenityNotFoundException;
 import edu.uniquindio.stayhub.api.exception.InactiveAmenityException;
 import edu.uniquindio.stayhub.api.mapper.AmenityMapper;
@@ -31,61 +33,72 @@ public class AmenityService {
 
     /**
      * Retrieves all active amenities.
-     * @return List of AmenityDTO representing active amenities.
+     * @return List of AmenityResponseDTO representing active amenities.
      */
     @Transactional(readOnly = true)
-    public List<AmenityDTO> getAllActiveAmenities() {
+    public List<AmenityResponseDTO> getAllActiveAmenities() {
         LOGGER.info("Fetching all active amenities");
-        return amenityRepository.findByIsActiveTrueOrderByName()
+        return amenityRepository.findByActiveTrueOrderByName()
                 .stream()
-                .map(amenityMapper::toDto)
+                .map(amenityMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
     /**
      * Creates a new amenity.
-     * @param amenityDTO Data of the amenity to create.
-     * @return AmenityDTO of the created amenity.
+     * @param amenityRequestDTO Data of the amenity to create.
+     * @return AmenityResponseDTO of the created amenity.
      */
-    public AmenityDTO createAmenity(AmenityDTO amenityDTO) {
-        LOGGER.info("Creating amenity with name: {}", amenityDTO.getName());
+    public AmenityResponseDTO createAmenity(AmenityRequestDTO amenityRequestDTO) {
+        LOGGER.info("Creating amenity with name: {}", amenityRequestDTO.getName());
 
-        if (amenityRepository.existsByName(amenityDTO.getName())) {
+        if (amenityRepository.existsByName(amenityRequestDTO.getName())) {
             throw new IllegalArgumentException("Ya existe un servicio con ese nombre");
         }
 
-        Amenity amenity = amenityMapper.toEntity(amenityDTO);
+        Amenity amenity = amenityMapper.requestToEntity(amenityRequestDTO);
         amenity.setActive(true);
 
         Amenity savedAmenity = amenityRepository.save(amenity);
         LOGGER.debug("Amenity created successfully with ID: {}", savedAmenity.getId());
 
-        return amenityMapper.toDto(savedAmenity);
+        return amenityMapper.toResponseDTO(savedAmenity);
     }
 
     /**
      * Updates an existing amenity.
      * @param id The ID of the amenity to update.
-     * @param amenityDTO The updated data.
-     * @return Updated AmenityDTO.
+     * @param amenityUpdateDTO The updated data.
+     * @return Updated AmenityResponseDTO.
      */
-    public AmenityDTO updateAmenity(Long id, AmenityDTO amenityDTO) {
+    public AmenityResponseDTO updateAmenity(Long id, AmenityUpdateDTO amenityUpdateDTO) {
         LOGGER.info("Updating amenity with ID: {}", id);
 
         Amenity existing = amenityRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("El servicio no existe"));
 
-        if (!existing.getName().equalsIgnoreCase(amenityDTO.getName())
-                && amenityRepository.existsByName(amenityDTO.getName())) {
+        if (amenityUpdateDTO.getName() != null
+                && !existing.getName().equalsIgnoreCase(amenityUpdateDTO.getName())
+                && amenityRepository.existsByName(amenityUpdateDTO.getName())) {
             throw new IllegalArgumentException("Ya existe un servicio con ese nombre");
         }
 
-        existing.setName(amenityDTO.getName());
+        if (amenityUpdateDTO.getName() != null) {
+            existing.setName(amenityUpdateDTO.getName());
+        }
+
+        if (amenityUpdateDTO.getDescription() != null) {
+            existing.setDescription(amenityUpdateDTO.getDescription());
+        }
+
+        if (amenityUpdateDTO.getActive() != null) {
+            existing.setActive(amenityUpdateDTO.getActive());
+        }
 
         Amenity updated = amenityRepository.save(existing);
         LOGGER.debug("Amenity updated successfully: {}", updated.getName());
 
-        return amenityMapper.toDto(updated);
+        return amenityMapper.toResponseDTO(updated);
     }
 
     /**
@@ -102,8 +115,15 @@ public class AmenityService {
         LOGGER.debug("Amenity deactivated successfully with ID: {}", id);
     }
 
+    /**
+     * Retrieves an active amenity by ID.
+     * @param id The ID of the amenity.
+     * @return AmenityResponseDTO of the amenity.
+     * @throws AmenityNotFoundException if amenity doesn't exist.
+     * @throws InactiveAmenityException if amenity is inactive.
+     */
     @Transactional(readOnly = true)
-    public AmenityDTO getAmenityById(Long id) {
+    public AmenityResponseDTO getAmenityById(Long id) {
         LOGGER.info("Fetching amenity with ID: {}", id);
         Amenity amenity = amenityRepository.findById(id)
                 .orElseThrow(() -> new AmenityNotFoundException("Amenity not found with ID: " + id));
@@ -112,6 +132,6 @@ public class AmenityService {
             throw new InactiveAmenityException("Amenity with ID " + id + " is inactive");
         }
 
-        return amenityMapper.toDto(amenity);
+        return amenityMapper.toResponseDTO(amenity);
     }
 }

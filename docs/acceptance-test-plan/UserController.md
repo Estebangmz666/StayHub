@@ -34,21 +34,21 @@
 }
 ```  
 **Success Criteria:** The response returns the 201 Created code and the body matches the expected format with a generated ID.  
-**Expected Result:** Receive a HTTP 201 response code and the created user profile.  
+**Expected Result:** Receive an HTTP 201 response code and the created user profile.  
 
 **Test Execution:**  
 Enter the data to register a new user in Postman and send the POST request.  
 
-![signup_test](/assets/signup_test.png)
+![signup_test](/docs/assets/signup_test.png)
 
 **Obtained Result:**  
 Received the expected HTTP 201 code.  
 
-![signup_response](/assets/signup_response.png)
+![signup_response](/docs/assets/signup_response.png)
 
 Validate the created data in the database (user table in MariaDB).  
 
-![signup_db](/assets/signup_db.png)
+![signup_db](/docs/assets/signup_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -76,19 +76,19 @@ Validate the created data in the database (user table in MariaDB).
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and the body contains a valid JWT token.  
-**Expected Result:** Receive a HTTP 200 response code and the JWT token.  
+**Expected Result:** Receive an HTTP 200 response code and the JWT token.  
 
 **Test Execution:**  
 Enter the login credentials in Postman and send the POST request.  
 
-![login_test](/assets/login_test.png)
+![login_test](/docs/assets/login_test.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![login_response](/assets/login_response.png)
+![login_response](/docs/assets/login_response.png)
 
-Validate the token by using it in a subsequent authenticated request (e.g., getProfile).  
+Validate the token by using it in a later authenticated request (e.g., getProfile).  
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -126,23 +126,23 @@ Validate the token by using it in a subsequent authenticated request (e.g., getP
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and the body reflects the updated data.  
-**Expected Result:** Receive a HTTP 200 response code and the updated user profile.  
+**Expected Result:** Receive an HTTP 200 response code and the updated user profile.  
 
 **Test Execution:**  
 Enter the user ID and updated data in Postman and send the PUT request with a valid JWT token.  
 
-![update_body](/assets/update_body.png)
-![update_headers](/assets/update_headers.png)
+![update_body](/docs/assets/update_body.png)
+![update_headers](/docs/assets/update_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![update_response](/assets/update_response.png)
+![update_response](/docs/assets/update_response.png)
 
 
 Validate the updated data in the database.  
 
-![update_db](/assets/update_db.png)
+![update_db](/docs/assets/update_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -164,21 +164,21 @@ Validate the updated data in the database.
 **Expected Response Code:** 200  
 **Expected Response Body:** None  
 **Success Criteria:** The response returns the 200 OK code and no body, with the reset token sent via email (mocked in test).  
-**Expected Result:** Receive a HTTP 200 response code and verify the reset process.  
+**Expected Result:** Receive an HTTP 200 response code and verify the reset process.  
 
 **Test Execution:**  
-Enter the email in Postman and send the POST request. Ensure rate limit is not exceeded.  
+Enter the email in Postman and send the POST request. Ensure the rate limit is not exceeded.  
 
-![reset_test](/assets/reset_test.png)
+![reset_test](/docs/assets/reset_test.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![reset_response](/assets/reset_response.png)
+![reset_response](/docs/assets/reset_response.png)
 
 Validate the token generation in the database (password_reset_token table in MariaDB).  
 
-![reset_db](/assets/reset_db.png)
+![reset_db](/docs/assets/reset_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -206,21 +206,21 @@ Validate the token generation in the database (password_reset_token table in Mar
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and the body contains the success message.  
-**Expected Result:** Receive a HTTP 200 response code and confirmation of password reset.  
+**Expected Result:** Receive an HTTP 200 response code and confirmation of password reset.  
 
 **Test Execution:**  
 Enter the token and new password in Postman and send the POST request.  
 
-![reset_body](/assets/reset_body.png)
+![reset_body](/docs/assets/reset_body.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![reset_response2](/assets/reset_response2.png)
+![reset_response2](/docs/assets/reset_response2.png)
 
 Validate the password update in the database (ensure the hashed password is updated).  
 
-![reset_db2](/assets/reset_db2.png) 
+![reset_db2](/docs/assets/reset_db2.png) 
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -250,18 +250,18 @@ Validate the password update in the database (ensure the hashed password is upda
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and the body matches the expected format.  
-**Expected Result:** Receive a HTTP 200 response code and the user profile.  
+**Expected Result:** Receive an HTTP 200 response code and the user profile.  
 
 **Test Execution:**  
 Enter the user ID in Postman and send the GET request with a valid JWT token.  
 
-![profile_body](/assets/profile_body.png) 
-![profile_headers](/assets/profile_headers.png)
+![profile_body](/docs/assets/profile_body.png) 
+![profile_headers](/docs/assets/profile_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![profile_response](/assets/profile_response.png)
+![profile_response](/docs/assets/profile_response.png)
 
 Validate the data in the database (ensure it matches the record).  
 

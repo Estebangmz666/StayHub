@@ -1,9 +1,12 @@
 package edu.uniquindio.stayhub.api.controller;
 
-import edu.uniquindio.stayhub.api.dto.accommodation.AmenityDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityRequestDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityResponseDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityUpdateDTO;
 import edu.uniquindio.stayhub.api.service.AmenityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +33,9 @@ public class AmenityController {
 
     @Operation(summary = "List all active amenities")
     @GetMapping
-    public ResponseEntity<List<AmenityDTO>> getAllActiveAmenities() {
+    public ResponseEntity<List<AmenityResponseDTO>> getAllActiveAmenities() {
         LOGGER.info("Listing all active amenities");
-        List<AmenityDTO> amenities = amenityService.getAllActiveAmenities();
+        List<AmenityResponseDTO> amenities = amenityService.getAllActiveAmenities();
 
         return amenities.isEmpty()
                 ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
@@ -41,20 +44,20 @@ public class AmenityController {
 
     @Operation(summary = "Create a new amenity")
     @PostMapping
-    public ResponseEntity<AmenityDTO> createAmenity(
-            @RequestBody @Valid AmenityDTO amenityDTO) {
-        LOGGER.info("Request to create new amenity: {}", amenityDTO.getName());
-        AmenityDTO createdAmenity = amenityService.createAmenity(amenityDTO);
+    public ResponseEntity<AmenityResponseDTO> createAmenity(
+            @Valid @RequestBody AmenityRequestDTO amenityRequestDTO) {
+        LOGGER.info("Request to create new amenity: {}", amenityRequestDTO.getName());
+        AmenityResponseDTO createdAmenity = amenityService.createAmenity(amenityRequestDTO);
         return new ResponseEntity<>(createdAmenity, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update an existing amenity")
     @PutMapping("/{id}")
-    public ResponseEntity<AmenityDTO> updateAmenity(
+    public ResponseEntity<AmenityResponseDTO> updateAmenity(
             @PathVariable @Parameter(description = "Amenity ID", required = true) Long id,
-            @RequestBody @Valid AmenityDTO amenityDTO) {
+            @RequestBody AmenityUpdateDTO amenityUpdateDTO) {
         LOGGER.info("Request to update amenity with ID: {}", id);
-        AmenityDTO updatedAmenity = amenityService.updateAmenity(id, amenityDTO);
+        AmenityResponseDTO updatedAmenity = amenityService.updateAmenity(id, amenityUpdateDTO);
         return new ResponseEntity<>(updatedAmenity, HttpStatus.OK);
     }
 
@@ -69,10 +72,10 @@ public class AmenityController {
 
     @Operation(summary = "Get amenity details by ID")
     @GetMapping("/{id}")
-    public ResponseEntity<AmenityDTO> getAmenityById(
+    public ResponseEntity<AmenityResponseDTO> getAmenityById(
             @PathVariable @Parameter(description = "Amenity ID", required = true) Long id) {
         LOGGER.info("Request to get amenity with ID: {}", id);
-        AmenityDTO amenity = amenityService.getAmenityById(id);
+        AmenityResponseDTO amenity = amenityService.getAmenityById(id);
         return new ResponseEntity<>(amenity, HttpStatus.OK);
     }
 }

@@ -36,7 +36,7 @@ public class Amenity extends Auditable{
      * A flag indicating whether the amenity is currently active.
      */
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private boolean isActive;
+    private boolean active;
 
     /**
      * The description of the amenity.

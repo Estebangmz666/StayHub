@@ -1,29 +1,28 @@
+
 package edu.uniquindio.stayhub.api.mapper;
 
-import edu.uniquindio.stayhub.api.dto.accommodation.AmenityDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityRequestDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityResponseDTO;
 import edu.uniquindio.stayhub.api.model.Amenity;
 import org.mapstruct.Mapper;
 
 /**
- * Mapper interface for converting between {@link AmenityDTO} and {@link Amenity} entities.
- * This interface uses MapStruct to automatically generate the implementation.
+ * Mapper interface to map between various amenities DTO into {@link Amenity} entities, and vice versa.
  */
 @Mapper(componentModel = "spring")
 public interface AmenityMapper {
 
     /**
-     * Converts an {@link AmenityDTO} to an {@link Amenity} entity.
-     *
+     * Converts an {@link AmenityRequestDTO} to an {@link Amenity} entity.
      * @param dto The DTO to convert.
      * @return A new {@link Amenity} entity.
      */
-    Amenity toEntity(AmenityDTO dto);
+    Amenity requestToEntity(AmenityRequestDTO dto);
 
     /**
-     * Converts an {@link Amenity} entity to an {@link AmenityDTO}.
-     *
+     * Converts an {@link Amenity} entity to an {@link AmenityResponseDTO}.
      * @param amenity The entity to convert.
-     * @return A new {@link AmenityDTO}.
+     * @return A new {@link AmenityResponseDTO} with the mapped data.
      */
-    AmenityDTO toDto(Amenity amenity);
+    AmenityResponseDTO toResponseDTO(Amenity amenity);
 }

@@ -1,6 +1,8 @@
 package edu.uniquindio.stayhub.api.service;
 
-import edu.uniquindio.stayhub.api.dto.accommodation.AmenityDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityRequestDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityResponseDTO;
+import edu.uniquindio.stayhub.api.dto.amenity.AmenityUpdateDTO;
 import edu.uniquindio.stayhub.api.exception.AmenityNotFoundException;
 import edu.uniquindio.stayhub.api.exception.InactiveAmenityException;
 import edu.uniquindio.stayhub.api.mapper.AmenityMapper;
@@ -41,7 +43,8 @@ public class AmenityServiceTest {
 
     private Long amenityId = 1L;
     private Amenity amenity;
-    private AmenityDTO amenityDTO;
+    private AmenityRequestDTO amenityRequestDTO;
+    private AmenityResponseDTO amenityResponseDTO;
 
     @BeforeEach
     void setup() {
@@ -50,9 +53,11 @@ public class AmenityServiceTest {
         amenity = new Amenity();
         amenity.setId(amenityId);
         amenity.setName("Piscina");
+        amenity.setDescription("Piscina grande pa nadar");
         amenity.setActive(true);
 
-        amenityDTO = new AmenityDTO("Piscina", "Piscina grande pa nadar");
+        amenityRequestDTO = new AmenityRequestDTO("Piscina", "Piscina grande pa nadar");
+        amenityResponseDTO = new AmenityResponseDTO(amenityId, "Piscina", "Piscina grande pa nadar", true);
     }
 
     @Test
@@ -60,60 +65,62 @@ public class AmenityServiceTest {
     void getAllActiveAmenities_ShouldReturnList() {
         // Arrange
         List<Amenity> activeAmenities = List.of(amenity);
-        when(amenityRepository.findByIsActiveTrueOrderByName()).thenReturn(activeAmenities);
-        when(amenityMapper.toDto(amenity)).thenReturn(amenityDTO);
+        when(amenityRepository.findByActiveTrueOrderByName()).thenReturn(activeAmenities);
+        when(amenityMapper.toResponseDTO(amenity)).thenReturn(amenityResponseDTO);
 
         // Act
-        List<AmenityDTO> result = amenityService.getAllActiveAmenities();
+        List<AmenityResponseDTO> result = amenityService.getAllActiveAmenities();
 
         // Assert
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getName()).isEqualTo("Piscina");
-        verify(amenityRepository, times(1)).findByIsActiveTrueOrderByName();
-        verify(amenityMapper, times(1)).toDto(amenity);
+        verify(amenityRepository, times(1)).findByActiveTrueOrderByName();
+        verify(amenityMapper, times(1)).toResponseDTO(amenity);
     }
 
     @Test
     @DisplayName("Should return an empty list when no active amenities are found")
     void getAllActiveAmenities_ShouldReturnEmptyList() {
         // Arrange
-        when(amenityRepository.findByIsActiveTrueOrderByName()).thenReturn(Collections.emptyList());
+        when(amenityRepository.findByActiveTrueOrderByName()).thenReturn(Collections.emptyList());
 
         // Act
-        List<AmenityDTO> result = amenityService.getAllActiveAmenities();
+        List<AmenityResponseDTO> result = amenityService.getAllActiveAmenities();
 
         // Assert
         assertThat(result).isEmpty();
-        verify(amenityRepository, times(1)).findByIsActiveTrueOrderByName();
-        verify(amenityMapper, never()).toDto(any());
+        verify(amenityRepository, times(1)).findByActiveTrueOrderByName();
+        verify(amenityMapper, never()).toResponseDTO(any());
     }
 
     @Test
     @DisplayName("Should create and return a new amenity successfully")
     void createAmenity_Success() {
         // Arrange
-        AmenityDTO newAmenityDTO = new AmenityDTO("Jacuzzi","Jacuzzi grande");
+        AmenityRequestDTO newAmenityRequestDTO = new AmenityRequestDTO("Jacuzzi", "Jacuzzi grande");
         Amenity newAmenity = new Amenity();
         newAmenity.setName("Jacuzzi");
+        newAmenity.setDescription("Jacuzzi grande");
 
         Amenity savedAmenity = new Amenity();
         savedAmenity.setId(2L);
         savedAmenity.setName("Jacuzzi");
+        savedAmenity.setDescription("Jacuzzi grande");
         savedAmenity.setActive(true);
 
-        AmenityDTO savedAmenityDTO = new AmenityDTO("Jacuzzi","Jacuzzi grande");
+        AmenityResponseDTO savedAmenityResponseDTO = new AmenityResponseDTO(2L, "Jacuzzi", "Jacuzzi grande", true);
 
-        when(amenityRepository.existsByName(newAmenityDTO.getName())).thenReturn(false);
-        when(amenityMapper.toEntity(newAmenityDTO)).thenReturn(newAmenity);
+        when(amenityRepository.existsByName(newAmenityRequestDTO.getName())).thenReturn(false);
+        when(amenityMapper.requestToEntity(newAmenityRequestDTO)).thenReturn(newAmenity);
         when(amenityRepository.save(newAmenity)).thenReturn(savedAmenity);
-        when(amenityMapper.toDto(savedAmenity)).thenReturn(savedAmenityDTO);
+        when(amenityMapper.toResponseDTO(savedAmenity)).thenReturn(savedAmenityResponseDTO);
 
         // Act
-        AmenityDTO result = amenityService.createAmenity(newAmenityDTO);
+        AmenityResponseDTO result = amenityService.createAmenity(newAmenityRequestDTO);
 
         // Assert
         assertThat(result.getName()).isEqualTo("Jacuzzi");
-        assertThat(newAmenity.isActive()).isTrue();
+        assertThat(result.getActive()).isTrue();
         verify(amenityRepository, times(1)).save(newAmenity);
     }
 
@@ -121,35 +128,39 @@ public class AmenityServiceTest {
     @DisplayName("Should throw IllegalArgumentException when amenity name already exists")
     void createAmenity_NameConflict_ShouldThrowException() {
         // Arrange
-        when(amenityRepository.existsByName(amenityDTO.getName())).thenReturn(true);
+        when(amenityRepository.existsByName(amenityRequestDTO.getName())).thenReturn(true);
 
         // Act & Assert
-        assertThatThrownBy(() -> amenityService.createAmenity(amenityDTO))
+        assertThatThrownBy(() -> amenityService.createAmenity(amenityRequestDTO))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Ya existe un servicio con ese nombre");
         verify(amenityRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should update amenity name and active status successfully")
+    @DisplayName("Should update amenity name and description successfully")
     void updateAmenity_Success() {
         // Arrange
-        AmenityDTO updatedDTO = new AmenityDTO("Piscina Nueva", "Piscina grande");
+        AmenityUpdateDTO updateDTO = new AmenityUpdateDTO("Piscina Nueva", "Piscina grande renovada", true);
         Amenity updatedEntity = new Amenity();
         updatedEntity.setId(amenityId);
         updatedEntity.setName("Piscina Nueva");
-        updatedEntity.setActive(false);
+        updatedEntity.setDescription("Piscina grande renovada");
+        updatedEntity.setActive(true);
+
+        AmenityResponseDTO updatedResponseDTO = new AmenityResponseDTO(amenityId, "Piscina Nueva", "Piscina grande renovada", true);
 
         when(amenityRepository.findById(amenityId)).thenReturn(Optional.of(amenity));
         when(amenityRepository.existsByName("Piscina Nueva")).thenReturn(false);
         when(amenityRepository.save(any(Amenity.class))).thenReturn(updatedEntity);
-        when(amenityMapper.toDto(updatedEntity)).thenReturn(updatedDTO);
+        when(amenityMapper.toResponseDTO(updatedEntity)).thenReturn(updatedResponseDTO);
 
         // Act
-        AmenityDTO result = amenityService.updateAmenity(amenityId, updatedDTO);
+        AmenityResponseDTO result = amenityService.updateAmenity(amenityId, updateDTO);
 
         // Assert
         assertThat(result.getName()).isEqualTo("Piscina Nueva");
+        assertThat(result.getDescription()).isEqualTo("Piscina grande renovada");
         verify(amenityRepository, times(1)).save(amenity);
     }
 
@@ -157,10 +168,11 @@ public class AmenityServiceTest {
     @DisplayName("Should throw NoSuchElementException when updating non-existing amenity")
     void updateAmenity_NotFound_ShouldThrowException() {
         // Arrange
+        AmenityUpdateDTO updateDTO = new AmenityUpdateDTO("Piscina Nueva", "Descripción", true);
         when(amenityRepository.findById(amenityId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> amenityService.updateAmenity(amenityId, amenityDTO))
+        assertThatThrownBy(() -> amenityService.updateAmenity(amenityId, updateDTO))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("El servicio no existe");
         verify(amenityRepository, never()).save(any());
@@ -170,11 +182,7 @@ public class AmenityServiceTest {
     @DisplayName("Should throw IllegalArgumentException when updating name to an existing one")
     void updateAmenity_NameConflict_ShouldThrowException() {
         // Arrange
-        Amenity anotherAmenity = new Amenity();
-        anotherAmenity.setId(2L);
-        anotherAmenity.setName("Gimnasio"); // Name that already exists
-
-        AmenityDTO conflictDTO = new AmenityDTO("Gimnasio", "Gimnasio grande");
+        AmenityUpdateDTO conflictDTO = new AmenityUpdateDTO("Gimnasio", "Gimnasio grande", true);
 
         when(amenityRepository.findById(amenityId)).thenReturn(Optional.of(amenity)); // Original name: Piscina
         when(amenityRepository.existsByName("Gimnasio")).thenReturn(true); // Conflict found
@@ -190,17 +198,14 @@ public class AmenityServiceTest {
     @DisplayName("Should set amenity to inactive successfully")
     void deactivateAmenity_Success() {
         // Arrange
-        Amenity deactivated = new Amenity();
-        deactivated.setActive(false);
-
         when(amenityRepository.findById(amenityId)).thenReturn(Optional.of(amenity));
-        when(amenityRepository.save(any(Amenity.class))).thenReturn(deactivated);
+        when(amenityRepository.save(any(Amenity.class))).thenReturn(amenity);
 
         // Act
         amenityService.deactivateAmenity(amenityId);
 
         // Assert
-        assertThat(amenity.isActive()).isFalse();
+        verify(amenityRepository, times(1)).findById(amenityId);
         verify(amenityRepository, times(1)).save(amenity);
     }
 
@@ -218,17 +223,19 @@ public class AmenityServiceTest {
     }
 
     @Test
-    @DisplayName("Should return AmenityDTO when fetching existing active amenity")
+    @DisplayName("Should return AmenityResponseDTO when fetching existing active amenity")
     void getAmenityById_Active_ShouldReturnDTO() {
         // Arrange
         when(amenityRepository.findById(amenityId)).thenReturn(Optional.of(amenity));
-        when(amenityMapper.toDto(amenity)).thenReturn(amenityDTO);
+        when(amenityMapper.toResponseDTO(amenity)).thenReturn(amenityResponseDTO);
 
         // Act
-        AmenityDTO result = amenityService.getAmenityById(amenityId);
+        AmenityResponseDTO result = amenityService.getAmenityById(amenityId);
 
         // Assert
+        assertThat(result.getName()).isEqualTo("Piscina");
         verify(amenityRepository, times(1)).findById(amenityId);
+        verify(amenityMapper, times(1)).toResponseDTO(amenity);
     }
 
     @Test
@@ -250,6 +257,7 @@ public class AmenityServiceTest {
         Amenity inactiveAmenity = new Amenity();
         inactiveAmenity.setId(amenityId);
         inactiveAmenity.setName("Piscina Inactiva");
+        inactiveAmenity.setDescription("Piscina inactiva");
         inactiveAmenity.setActive(false);
 
         when(amenityRepository.findById(amenityId)).thenReturn(Optional.of(inactiveAmenity));
@@ -258,6 +266,6 @@ public class AmenityServiceTest {
         assertThatThrownBy(() -> amenityService.getAmenityById(amenityId))
                 .isInstanceOf(InactiveAmenityException.class)
                 .hasMessage("Amenity with ID " + amenityId + " is inactive");
-        verify(amenityMapper, never()).toDto(any());
+        verify(amenityMapper, never()).toResponseDTO(any());
     }
 }

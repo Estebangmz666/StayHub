@@ -80,40 +80,81 @@ public class SecurityConfig {
                                 // === PUBLIC ENDPOINTS ===
                                 .requestMatchers(
                                         "/swagger-ui/**",
-                                        "/v3/api-docs/**").permitAll() //TODO Replace in prod
+                                        "/v3/api-docs/**"
+                                ).permitAll() // TODO: Replace in prod
 
+                                // ==== USER ENDPOINTS (public login/register/password reset) ====
                                 .requestMatchers(
                                         "/api/v1/users/register",
                                         "/api/v1/users/login",
                                         "/api/v1/users/request-password-reset",
-                                        "/api/v1/users/reset-password").permitAll()
-
-                                .requestMatchers(
-                                        "GET", "/api/v1/accommodations",
-                                        "GET", "/api/v1/accommodations/**",
-                                        "GET", "/api/v1/accommodations/search"
+                                        "/api/v1/users/reset-password"
                                 ).permitAll()
 
-                                // === PROTECTED ENDPOINTS ===
+                                // ==== ACCOMMODATION PUBLIC ENDPOINTS ====
+                                .requestMatchers(
+                                        "/api/v1/accommodations",
+                                        "/api/v1/accommodations/search",
+                                        "/api/v1/accommodations/{id}"
+                                ).permitAll()
+
+                                // ==== AMENITY PUBLIC ENDPOINTS ====
+                                .requestMatchers(
+                                        "/api/v1/amenities",
+                                        "/api/v1/amenities/**"
+                                ).permitAll()
+
+                                // ==== ACCOMMODATION PROTECTED ENDPOINTS ====
+                                .requestMatchers(
+                                        "POST", "/api/v1/accommodations"
+                                ).authenticated()
+                                .requestMatchers(
+                                        "PUT", "/api/v1/accommodations/**"
+                                ).authenticated()
+                                .requestMatchers(
+                                        "DELETE", "/api/v1/accommodations/**"
+                                ).authenticated()
+
+                                // ==== USER PROTECTED ENDPOINTS ====
                                 .requestMatchers(
                                         "PUT", "/api/v1/users/profile"
                                 ).authenticated()
 
+                                // ==== RESERVATION PROTECTED ENDPOINTS ====
                                 .requestMatchers(
-                                        "POST", "/api/v1/accommodations",
-                                        "PUT", "/api/v1/accommodations/**",
-                                        "DELETE", "/api/v1/accommodations/**"
-                                ).authenticated()
-
-                                .requestMatchers(
-                                        "GET", "/api/v1/reservations/",
-                                        "POST", "/api/v1/reservations/",
+                                        "GET", "/api/v1/reservations/**",
+                                        "POST", "/api/v1/reservations/**",
                                         "PUT", "/api/v1/reservations/**",
-                                        "DELETE", "/api/v1/reservations/**",
-                                        "GET", "/api/v1/reservations/accommodations/**"
+                                        "DELETE", "/api/v1/reservations/**"
                                 ).authenticated()
 
-                                // === DEFAULT ENDPOINTS ===
+                                // ==== COMMENT PUBLIC ENDPOINTS ====
+                                .requestMatchers(
+                                        "/api/v1/comments/accommodation/{accommodationId}",
+                                        "/api/v1/comments/accommodation/{accommodationId}/paged",
+                                        "/api/v1/comments/accommodation/{accommodationId}/average-rating",
+                                        "/api/v1/comments/accommodation/{accommodationId}/count"
+                                ).permitAll()
+
+                                // ==== COMMENT PROTECTED ENDPOINTS ====
+                                .requestMatchers(
+                                        "POST", "/api/v1/comments"
+                                ).authenticated()
+                                .requestMatchers(
+                                        "GET", "/api/v1/comments/user/{userId}"
+                                ).authenticated()
+                                .requestMatchers(
+                                        "PUT", "/api/v1/comments/{id}"
+                                ).authenticated()
+                                .requestMatchers(
+                                        "DELETE", "/api/v1/comments/{id}"
+                                ).authenticated()
+                                .requestMatchers(
+                                        "POST", "/api/v1/comments/{id}/reply"
+                                ).authenticated()
+
+
+                                // ==== DEFAULT RULE ====
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
