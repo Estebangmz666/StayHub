@@ -1,0 +1,20 @@
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+input.error {
+  border-color: red;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+}

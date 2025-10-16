@@ -1,0 +1,18 @@
+<div class="input-wrapper">
+  @if (label) {
+    <label [for]="id">{{ label }}</label>
+  }
+
+  <input
+    [id]="id"
+    [type]="type"
+    [placeholder]="placeholder"
+    [value]="value"
+    (input)="onInput($event)"
+    [class.error]="error"
+  />
+
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+</div>
