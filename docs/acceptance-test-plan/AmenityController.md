@@ -30,10 +30,14 @@
 **Expected Result:** Receive a HTTP 200 response code and the list of active amenities.  
 
 **Test Execution:**  
-Enter the endpoint URL in Postman and send the GET request.   
+Enter the endpoint URL in Postman and send the GET request.
+
+![list_amenities_request](/docs/assets/list_amenities_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![list_amenities_response](/docs/assets/list_amenities_response.png)
 
 Validate the data in the database (amenity table in MariaDB, ensure only isActive = true records).  
 
@@ -70,14 +74,17 @@ Validate the data in the database (amenity table in MariaDB, ensure only isActiv
 **Expected Result:** Receive a HTTP 201 response code and the created amenity.  
 
 **Test Execution:**  
-Enter the data to create a new amenity in Postman and send the POST request.   
+Enter the data to create a new amenity in Postman and send the POST request.
+![create_amenity_body](/docs/assets/create_amenity_body.png)
 
 **Obtained Result:**  
-Received the expected HTTP 201 code.  
+Received the expected HTTP 201 code.
+
+![create_amenity_response](/docs/assets/create_amenity_response.png)
 
 Validate the created data in the database (amenity table in MariaDB).  
 
-*(Paste the SELECT query screenshot from the database here showing the new record.)*  
+![create_amenity_db](/docs/assets/create_amenity_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -111,12 +118,18 @@ Validate the created data in the database (amenity table in MariaDB).
 **Expected Result:** Receive a HTTP 200 response code and the updated amenity.  
 
 **Test Execution:**  
-Enter the ID and updated data in Postman and send the PUT request.  
+Enter the ID and updated data in Postman and send the PUT request.
+
+![update_amenity_body](/docs/assets/update_amenity_body.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
 
-Validate the updated data in the database.  
+![update_amenity_response](/docs/assets/update_amenity_response.png)
+
+Validate the updated data in the database.
+
+![update_amenity_db](/docs/assets/update_amenity_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -136,12 +149,18 @@ Validate the updated data in the database.
 **Expected Result:** Receive a HTTP 204 response code and confirmation of deactivation.  
 
 **Test Execution:**  
-Enter the ID in Postman and send the DELETE request.  
+Enter the ID in Postman and send the DELETE request.
+
+![deactivate_amenity_request](/docs/assets/deactivate_amenity_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 204 code.  
+Received the expected HTTP 204 code.
 
-Validate the data in the database (ensure isActive = false for the specified ID).  
+![deactivate_amenity_response](/docs/assets/deactivate_amenity_response.png)
+
+Validate the data in the database (ensure active = 0 for the specified ID).
+
+![deactivate_amenity_db](/docs/assets/deactivate_amenity_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -169,13 +188,16 @@ Validate the data in the database (ensure isActive = false for the specified ID)
 **Expected Result:** Receive a HTTP 200 response code and the amenity details.  
 
 **Test Execution:**  
-Enter the amenity ID in Postman and send the GET request.  
+Enter the amenity ID in Postman and send the GET request.
+
+![get_amenity_by_id_request](/docs/assets/get_amenity_by_id_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![get_amenity_by_id_response](/docs/assets/get_amenity_by_id_response.png)
 
 Validate the data in the database (optional, as it’s a read operation).  
-
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  

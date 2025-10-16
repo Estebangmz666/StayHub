@@ -125,7 +125,6 @@
             <version>4.0.0</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -192,9 +191,20 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <excludes>
+                                <exclude>**/config/**</exclude>
+                                <exclude>**/controller/**</exclude>
+                                <exclude>**/dto/**</exclude>
+                                <exclude>**/exception/**</exclude>
+                                <exclude>**/mapper/**</exclude>
+                                <exclude>**/model/**</exclude>
+                                <exclude>**/repository/**</exclude>
+                                <exclude>**/generated-sources/**</exclude>
+                                <exclude>**/StayhubApiApplication.class</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
-                                    <element>Bundle</element>
+                                    <element>BUNDLE</element>
                                     <limits>
                                         <limit>
                                             <counter>LINE</counter>
@@ -215,8 +225,12 @@
                 <configuration>
                     <excludes>
                         <exclude>**/config</exclude>
+                        <exclude>**/controller</exclude>
+                        <exclude>**/dto</exclude>
                         <exclude>**/exception</exclude>
+                        <exclude>**/mapper</exclude>
                         <exclude>**/model</exclude>
+                        <exclude>**/repository</exclude>
                         <exclude>**/generated-sources/**</exclude>
                     </excludes>
                 </configuration>

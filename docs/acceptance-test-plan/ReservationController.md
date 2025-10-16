@@ -10,11 +10,11 @@
 **Request Body:**  
 ```json
 {
+  "guestId": 2,
   "accommodationId": 1,
-  "checkInDate": "2025-10-15",
-  "checkOutDate": "2025-10-20",
-  "numberOfGuests": 2,
-  "totalPrice": 750.00
+  "checkInDate": "2025-11-20T15:00:00",
+  "checkOutDate": "2025-11-25T11:00:00",
+  "numberOfGuests": 2
 }
 ```  
 **Expected Response Code:** 201  
@@ -22,15 +22,16 @@
 ```json
 {
   "id": 1,
+  "guestId": 2,
+  "accommodationTitle": "Cabaña del Bosque Encantado",
   "accommodationId": 1,
-  "userId": 1,
-  "checkInDate": "2025-10-15",
-  "checkOutDate": "2025-10-20",
+  "checkInDate": "2025-11-20T15:00:00",
+  "checkOutDate": "2025-11-25T11:00:00",
   "numberOfGuests": 2,
-  "totalPrice": 750.00,
+  "totalPrice": 1250000.00,
   "status": "PENDING",
-  "createdAt": "2025-10-12T19:29:00Z",
-  "isDeleted": false
+  "createdAt": "2025-10-15T23:20:03.0258485",
+  "updatedAt": "2025-10-15T23:20:03.0258485"
 }
 ```  
 **Success Criteria:** The response returns the 201 Created code and the body matches the expected format with a generated ID.  
@@ -39,12 +40,17 @@
 **Test Execution:**  
 Enter the data to create a new reservation in Postman and send the POST request with a valid JWT token.  
 
-*(Paste the Postman screenshot here showing the body, headers, and request submission.)*  
+![create_reservation_body](/docs/assets/create_reservation_body.png)
+![create_reservation_headers](/docs/assets/create_reservation_headers.png)
 
 **Obtained Result:**  
-Received the expected HTTP 201 code.  
+Received the expected HTTP 201 code.
 
-Validate the created data in the database (reservation table in MariaDB).  
+![create_reservation_response](/docs/assets/create_reservation_response.png)
+
+Validate the created data in the database (reservation table in MariaDB).
+
+![create_reservation_db](/docs/assets/create_reservation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -63,25 +69,30 @@ Validate the created data in the database (reservation table in MariaDB).
 ```json
 {
   "id": 1,
+  "guestId": 2,
+  "accommodationTitle": "Cabaña del Bosque Encantado",
   "accommodationId": 1,
-  "userId": 1,
-  "checkInDate": "2025-10-15",
-  "checkOutDate": "2025-10-20",
+  "checkInDate": "2025-11-20T15:00:00",
+  "checkOutDate": "2025-11-25T11:00:00",
   "numberOfGuests": 2,
-  "totalPrice": 750.00,
+  "totalPrice": 1250000.00,
   "status": "PENDING",
-  "createdAt": "2025-10-12T19:29:00Z",
-  "isDeleted": false
+  "createdAt": "2025-10-15T23:20:03.025848",
+  "updatedAt": "2025-10-15T23:20:03.025848"
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and the body matches the expected format.  
 **Expected Result:** Receive a HTTP 200 response code and the reservation details.  
 
 **Test Execution:**  
-Enter the reservation ID in Postman and send the GET request with a valid JWT token.  
+Enter the reservation ID in Postman and send the GET request with a valid JWT token.
+
+![get_reservation_by_id_request](/docs/assets/get_reservation_by_id_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![get_reservation_by_id_response](/docs/assets/get_reservation_by_id_response.png)
 
 Validate the data in the database (ensure it matches the record).  
 
@@ -107,27 +118,35 @@ Validate the data in the database (ensure it matches the record).
 ```json
 {
   "id": 1,
+  "guestId": 2,
+  "accommodationTitle": "Cabaña del Bosque Encantado",
   "accommodationId": 1,
-  "userId": 1,
-  "checkInDate": "2025-10-15",
-  "checkOutDate": "2025-10-20",
+  "checkInDate": "2025-11-20T15:00:00",
+  "checkOutDate": "2025-11-25T11:00:00",
   "numberOfGuests": 2,
-  "totalPrice": 750.00,
+  "totalPrice": 1250000.00,
   "status": "CONFIRMED",
-  "createdAt": "2025-10-12T19:29:00Z",
-  "isDeleted": false
+  "createdAt": "2025-10-15T23:20:03.025848",
+  "updatedAt": "2025-10-15T23:20:03.025848"
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and the body reflects the updated status.  
 **Expected Result:** Receive a HTTP 200 response code and the updated reservation.  
 
 **Test Execution:**  
-Enter the ID and updated data in Postman and send the PUT request with a valid JWT token.  
+Enter the ID and updated data in Postman and send the PUT request with a valid JWT token.
+
+![update_reservation_body](/docs/assets/update_reservation_body.png)
+![update_reservation_headers](/docs/assets/update_reservation_headers.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
 
-Validate the updated data in the database (ensure status is updated).  
+![update_reservation_response](/docs/assets/update_reservation_response.png)
+
+Validate the updated data in the database (ensure status is updated).
+
+![update_reservation_db](/docs/assets/update_reservation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -152,12 +171,18 @@ Validate the updated data in the database (ensure status is updated).
 **Expected Result:** Receive a HTTP 200 response code and confirmation of cancellation.  
 
 **Test Execution:**  
-Enter the ID in Postman and send the DELETE request with a valid JWT token.  
+Enter the ID in Postman and send the DELETE request with a valid JWT token.
+
+![cancel_reservation_request](/docs/assets/cancel_reservation_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
 
-Validate the data in the database (ensure isDeleted = true and status = CANCELLED).  
+![cancel_reservation_response](/docs/assets/cancel_reservation_response.png)
+
+Validate the data in the database (ensure isDeleted = true and status = CANCELLED).
+
+![cancel_reservation_db](/docs/assets/cancel_reservation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -176,18 +201,19 @@ Validate the data in the database (ensure isDeleted = true and status = CANCELLE
 ```json
 {
   "content": [
-    {
-      "id": 1,
-      "accommodationId": 1,
-      "userId": 1,
-      "checkInDate": "2025-10-15",
-      "checkOutDate": "2025-10-20",
-      "numberOfGuests": 2,
-      "totalPrice": 750.00,
-      "status": "PENDING",
-      "createdAt": "2025-10-12T19:29:00Z",
-      "isDeleted": false
-    }
+      {
+          "id": 1,
+          "guestId": 2,
+          "accommodationTitle": "Cabaña del Bosque Encantado",
+          "accommodationId": 1,
+          "checkInDate": "2025-11-20T15:00:00",
+          "checkOutDate": "2025-11-25T11:00:00",
+          "numberOfGuests": 2,
+          "totalPrice": 1250000.00,
+          "status": "CONFIRMED",
+          "createdAt": "2025-10-15T23:20:03.025848",
+          "updatedAt": "2025-10-15T23:25:44.379979"
+      }
   ],
   "page": 0,
   "size": 10,
@@ -198,10 +224,14 @@ Validate the data in the database (ensure isDeleted = true and status = CANCELLE
 **Expected Result:** Receive a HTTP 200 response code and the list of reservations.  
 
 **Test Execution:**  
-Enter the pagination parameters and optional status in Postman and send the GET request with a valid JWT token.  
+Enter the pagination parameters and optional status in Postman and send the GET request with a valid JWT token.
+
+![list_user_reservations_request](/docs/assets/list_user_reservations_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![list_user_reservations_response](/docs/assets/list_user_reservations_response.png)
 
 Validate the data in the database (ensure it matches the user’s active reservations).  
 
@@ -221,33 +251,38 @@ Validate the data in the database (ensure it matches the user’s active reserva
 **Expected Response Body:**  
 ```json
 {
-  "content": [
-    {
-      "id": 1,
-      "accommodationId": 1,
-      "userId": 1,
-      "checkInDate": "2025-10-15",
-      "checkOutDate": "2025-10-20",
-      "numberOfGuests": 2,
-      "totalPrice": 750.00,
-      "status": "PENDING",
-      "createdAt": "2025-10-12T19:29:00Z",
-      "isDeleted": false
-    }
-  ],
-  "page": 0,
-  "size": 10,
-  "totalElements": 1
+    "content": [
+        {
+            "id": 1,
+            "guestId": 2,
+            "accommodationTitle": "Cabaña del Bosque Encantado",
+            "accommodationId": 1,
+            "checkInDate": "2025-11-20T15:00:00",
+            "checkOutDate": "2025-11-25T11:00:00",
+            "numberOfGuests": 2,
+            "totalPrice": 1250000.00,
+            "status": "CONFIRMED",
+            "createdAt": "2025-10-15T23:20:03.025848",
+            "updatedAt": "2025-10-15T23:25:44.379979"
+        }
+    ],
+    "page": 0,
+    "size": 10,
+    "totalElements": 1
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and a paginated list of reservations (or 204 if empty).  
 **Expected Result:** Receive a HTTP 200 response code and the list of reservations for the accommodation.  
 
 **Test Execution:**  
-Enter the accommodation ID, pagination parameters, and optional status in Postman and send the GET request with a valid JWT token for the host.  
+Enter the accommodation ID, pagination parameters, and optional status in Postman and send the GET request with a valid JWT token for the host.
+
+![list_accommodation_reservations_request](/docs/assets/list_accommodation_reservations_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![list_accommodation_reservations_response](/docs/assets/list_accommodation_reservations_response.png)
 
 Validate the data in the database (ensure it matches the accommodation’s active reservations).  
 

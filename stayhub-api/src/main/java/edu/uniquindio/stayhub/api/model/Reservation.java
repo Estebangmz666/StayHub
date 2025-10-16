@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
         @Index(name = "idx_check_in_date", columnList = "check_in_date"),
         @Index(name = "idx_deleted", columnList = "deleted")
 })
-@AssertTrue(message = "La fecha de check-out debe ser posterior al check-in")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
 public class Reservation extends Auditable{
 
@@ -104,4 +103,12 @@ public class Reservation extends Auditable{
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private boolean deleted = false;
+
+    @AssertTrue(message = "La fecha de check-out debe ser posterior al check-in")
+    public boolean isCheckOutAfterCheckIn() {
+        if (checkInDate == null || checkOutDate == null) {
+            return true;
+        }
+        return checkOutDate.isAfter(checkInDate);
+    }
 }

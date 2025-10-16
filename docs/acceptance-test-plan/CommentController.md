@@ -2,7 +2,7 @@
 
 ## Test Case 1: Create New Comment
 
-**Endpoint:** localhost:8080/api/comments  
+**Endpoint:** localhost:8080/api/v1/comments  
 **HTTP Method:** POST  
 **Description:** Allows an authenticated guest to create a comment/review for an accommodation. Requires authentication.  
 **Parameters:** None  
@@ -32,19 +32,27 @@
 ```  
 **Success Criteria:** The response returns the 201 Created code and the body matches the expected format with a generated ID.  
 **Expected Result:** Receive a HTTP 201 response code and the created comment.  
+**Test Execution:**  
+
+Enter the data to create a new comment in Postman and send the POST request with a valid JWT token.  
+![create_comment_body](/docs/assets/create_comment_body.png)
+![create_comment_headers](/docs/assets/create_comment_headers.png)
+
 
 **Obtained Result:**  
-Received the expected HTTP 201 code.  
+Received the expected HTTP 201 code.
+
+![create_comment_response](/docs/assets/create_comment_response.png)
 
 Validate the created data in the database (comment table in MariaDB).  
 
-**Test Passed? (Yes/No):** Yes  
+**Test Passed? (Yes/No):** Yes
 **Test Status (Accepted / Rejected):** Accepted  
 **Observations:** The test is accepted as the expected code was received and data was validated in the database.  
 
 ## Test Case 2: Get Comments by Accommodation
 
-**Endpoint:** localhost:8080/api/comments/accommodation/{accommodationId} (e.g., /1)  
+**Endpoint:** localhost:8080/api/v1/comments/accommodation/{accommodationId} (e.g., /1)  
 **HTTP Method:** GET  
 **Description:** Retrieves all non-deleted comments for a specific accommodation, ordered by creation date.  
 **Parameters:** accommodationId (in path, e.g., 1)  
@@ -70,10 +78,14 @@ Validate the created data in the database (comment table in MariaDB).
 **Expected Result:** Receive a HTTP 200 response code and the list of comments.  
 
 **Test Execution:**  
-Enter the accommodation ID in Postman and send the GET request.  
+Enter the accommodation ID in Postman and send the GET request.
+
+![get_comments_by_accommodation_request](/docs/assets/get_comments_by_accommodation_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
+
+![get_comments_by_accommodation_response](/docs/assets/get_comments_by_accommodation_response.png)
 
 Validate the data in the database (ensure only isActive = true records for the accommodation).  
 
@@ -83,7 +95,7 @@ Validate the data in the database (ensure only isActive = true records for the a
 
 ## Test Case 3: Get Paginated Comments by Accommodation
 
-**Endpoint:** localhost:8080/api/comments/accommodation/{accommodationId}/paged (e.g., /1?paged=0&size=5)  
+**Endpoint:** localhost:8080/api/v1/comments/accommodation/{accommodationId}/paged (e.g., /1?paged=0&size=5)  
 **HTTP Method:** GET  
 **Description:** Retrieves paginated non-deleted comments for a specific accommodation, ordered by creation date.  
 **Parameters:** accommodationId (in path, e.g., 1), page, size (e.g., page=0&size=5)  
@@ -114,10 +126,14 @@ Validate the data in the database (ensure only isActive = true records for the a
 **Expected Result:** Receive a HTTP 200 response code and the paginated comments.  
 
 **Test Execution:**  
-Enter the accommodation ID and pagination parameters in Postman and send the GET request.  
+Enter the accommodation ID and pagination parameters in Postman and send the GET request.
+
+![get_paginated_comments_by_accommodation_request](/docs/assets/get_paginated_comments_by_accommodation_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![get_paginated_comments_by_accommodation_response](/docs/assets/get_paginated_comments_by_accommodation_response.png)
 
 Validate the data in the database (ensure pagination matches active records).  
 
@@ -127,7 +143,7 @@ Validate the data in the database (ensure pagination matches active records).
 
 ## Test Case 4: Get Comments by User
 
-**Endpoint:** localhost:8080/api/comments/user/{userId} (e.g., /1)  
+**Endpoint:** localhost:8080/api/v1/comments/user/{userId} (e.g., /1)  
 **HTTP Method:** GET  
 **Description:** Retrieves all non-deleted comments made by a specific user. Requires authentication.  
 **Parameters:** userId (in path, e.g., 1)  
@@ -153,10 +169,15 @@ Validate the data in the database (ensure pagination matches active records).
 **Expected Result:** Receive a HTTP 200 response code and the list of comments.  
 
 **Test Execution:**  
-Enter the user ID in Postman and send the GET request with a valid JWT token.  
+Enter the user ID in Postman and send the GET request with a valid JWT token.
+
+![get_comments_by_user_request](/docs/assets/get_comments_by_user_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![get_comments_by_user_response](/docs/assets/get_comments_by_user_response.png)
+
 
 Validate the data in the database (ensure only the user’s active comments).  
 
@@ -181,10 +202,14 @@ Validate the data in the database (ensure only the user’s active comments).
 **Expected Result:** Receive a HTTP 200 response code and the average rating.  
 
 **Test Execution:**  
-Enter the accommodation ID in Postman and send the GET request.  
+Enter the accommodation ID in Postman and send the GET request.
+
+![get_average_rating_request](/docs/assets/get_average_rating_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![get_average_rating_response](/docs/assets/get_average_rating_response.png)
 
 Validate the calculation in the database (average of ratings where isActive = true).  
 
@@ -194,7 +219,7 @@ Validate the calculation in the database (average of ratings where isActive = tr
 
 ## Test Case 6: Get Comment Count for an Accommodation
 
-**Endpoint:** localhost:8080/api/comments/accommodation/{accommodationId}/count (e.g., /1)  
+**Endpoint:** localhost:8080/api/v1/comments/accommodation/{accommodationId}/count (e.g., /1)  
 **HTTP Method:** GET  
 **Description:** Counts the number of non-deleted comments for a specific accommodation.  
 **Parameters:** accommodationId (in path, e.g., 1)  
@@ -209,10 +234,14 @@ Validate the calculation in the database (average of ratings where isActive = tr
 **Expected Result:** Receive a HTTP 200 response code and the comment count.  
 
 **Test Execution:**  
-Enter the accommodation ID in Postman and send the GET request.  
+Enter the accommodation ID in Postman and send the GET request.
+
+![get_comment_count_request](/docs/assets/get_comment_count_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
+
+![get_comment_count_response](/docs/assets/get_comment_count_response.png)
 
 Validate the count in the database (count of records where isActive = true).  
 
@@ -230,9 +259,8 @@ Validate the count in the database (count of records where isActive = true).
 **Request Body:**  
 ```json
 {
-  "rating": 5,
-  "comment": "Amazing stay, highly recommend!",
-  "title": "Fantastic Experience"
+  "text": "Casa muy fria, no recomendada",
+  "rating": 2
 }
 ```  
 **Expected Response Code:** 200  
@@ -240,25 +268,30 @@ Validate the count in the database (count of records where isActive = true).
 ```json
 {
   "id": 1,
+  "userId": 2,
   "accommodationId": 1,
-  "userId": 1,
-  "rating": 5,
-  "comment": "Amazing stay, highly recommend!",
-  "title": "Fantastic Experience",
-  "createdAt": "2025-10-12T19:27:00Z",
-  "isActive": true
+  "text": "Casa muy fria, no recomendada",
+  "rating": 2,
+  "createdAt": "2025-10-15T22:22:04.463679"
 }
 ```  
 **Success Criteria:** The response returns the 200 OK code and the body reflects the updated data.  
 **Expected Result:** Receive a HTTP 200 response code and the updated comment.  
 
 **Test Execution:**  
-Enter the ID and updated data in Postman and send the PUT request with a valid JWT token.  
+Enter the ID and updated data in Postman and send the PUT request with a valid JWT token.
+
+![update_comment_body](/docs/assets/update_comment_body.png)
+![update_comment_headers](/docs/assets/update_comment_headers.png)
 
 **Obtained Result:**  
-Received the expected HTTP 200 code.  
+Received the expected HTTP 200 code.
 
-Validate the updated data in the database.  
+![update_comment_response](/docs/assets/update_comment_response.png)
+
+Validate the updated data in the database.
+
+![update_comment_db](/docs/assets/update_comment_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -278,12 +311,18 @@ Validate the updated data in the database.
 **Expected Result:** Receive a HTTP 204 response code and confirmation of deletion.  
 
 **Test Execution:**  
-Enter the ID in Postman and send the DELETE request with a valid JWT token.  
+Enter the ID in Postman and send the DELETE request with a valid JWT token.
+
+![delete_comment_request](/docs/assets/delete_comment_request.png)
 
 **Obtained Result:**  
-Received the expected HTTP 204 code.  
+Received the expected HTTP 204 code.
 
-Validate the data in the database (ensure isActive = false for the specified ID).  
+![delete_comment_response](/docs/assets/delete_comment_response.png)
+
+Validate the data in the database (ensure isActive = false for the specified ID).
+
+![delete_comment_db](/docs/assets/delete_comment_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -299,7 +338,7 @@ Validate the data in the database (ensure isActive = false for the specified ID)
 **Request Body:**  
 ```json
 {
-  "reply": "Thank you for your feedback!"
+  "replyText": "Thank you for your feedback!"
 }
 ```  
 **Expected Response Code:** 201  
@@ -307,27 +346,30 @@ Validate the data in the database (ensure isActive = false for the specified ID)
 ```json
 {
   "id": 1,
+  "userId": 2,
   "accommodationId": 1,
-  "userId": 1,
-  "rating": 5,
-  "comment": "Amazing stay, highly recommend!",
-  "title": "Fantastic Experience",
-  "createdAt": "2025-10-12T19:27:00Z",
-  "isActive": true,
-  "reply": "Thank you for your feedback!",
-  "repliedBy": 2
+  "text": "Casa muy fria, no recomendada",
+  "rating": 2,
+  "createdAt": "2025-10-15T22:22:04.463679"
 }
 ```  
 **Success Criteria:** The response returns the 201 Created code and the body includes the reply.  
 **Expected Result:** Receive a HTTP 201 response code and the comment with the reply.  
 
 **Test Execution:**  
-Enter the ID and reply data in Postman and send the POST request with a valid JWT token for a host.  
+Enter the ID and reply data in Postman and send the POST request with a valid JWT token for a host.
+
+![reply_to_comment_body](/docs/assets/reply_to_comment_body.png)
+![reply_to_comment_headers](/docs/assets/reply_to_comment_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 201 code.  
 
-Validate the updated data in the database (ensure reply and repliedBy are recorded).  
+![reply_to_comment_response](/docs/assets/reply_to_comment_response.png)
+
+Validate the updated data in the database (ensure reply and repliedBy are recorded).
+
+![reply_to_comment_db](/docs/assets/reply_to_comment_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  

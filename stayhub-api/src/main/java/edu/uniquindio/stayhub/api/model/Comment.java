@@ -65,18 +65,8 @@ public class Comment extends Auditable{
     @Max(value = 5, message = "La calificación debe ser entre 1 y 5")
     private Integer rating;
 
-    /**
-     * The Host reply to a Comment
-     */
-    @Column
-    @NotNull(message = "La respuesta debe tener contenido")
     private String hostReplyText;
 
-    /**
-     * The date when the host replied to the comment
-     */
-    @Column(nullable = false)
-    @NotNull
     private LocalDateTime replyDate;
 
     /**

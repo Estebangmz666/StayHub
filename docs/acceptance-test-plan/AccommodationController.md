@@ -46,17 +46,17 @@ The ID will be generated automatically. Requires authentication and that the use
 **Test Execution:**  
 Enter the data to create a new accommodation in Postman.  
 
-![create_accommodation_body](/assets/create_accommodation_body.png)
-![create_accommodation_headers](/assets/create_accommodation_headers.png)
+![create_accommodation_body](/docs/assets/create_accommodation_body.png)
+![create_accommodation_headers](/docs/assets/create_accommodation_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 201 code.  
 
-![create_accommodation_response](/assets/create_accommodation_response.png)
+![create_accommodation_response](/docs/assets/create_accommodation_response.png)
 
 Validate the created data in the database (accommodation table in MariaDB).  
 
-![create_accommodation_db](/assets/create_accommodation_db.png)
+![create_accommodation_db](/docs/assets/create_accommodation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -93,12 +93,12 @@ Validate the created data in the database (accommodation table in MariaDB).
 **Test Execution:**  
 Enter the accommodation ID in Postman and send the GET request.  
 
-![get_accommodation_by_id_request](/assets/get_accommodation_by_id_request.png)
+![get_accommodation_by_id_request](/docs/assets/get_accommodation_by_id_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![get_accommodation_by_id_response](/assets/get_accommodation_by_id_response.png) 
+![get_accommodation_by_id_response](/docs/assets/get_accommodation_by_id_response.png) 
 
 Validate the data in the database (optional, as it’s a read operation).  
 
@@ -151,17 +151,17 @@ Validate the data in the database (optional, as it’s a read operation).
 **Test Execution:**  
 Enter the updated data in Postman and send the PUT request.  
 
-![update_accommodation_body](/assets/update_accommodation_body.png)
-![update_accommodation_headers](/assets/update_accommodation_headers.png)
+![update_accommodation_body](/docs/assets/update_accommodation_body.png)
+![update_accommodation_headers](/docs/assets/update_accommodation_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![update_accommodation_response](/assets/update_accommodation_response.png)
+![update_accommodation_response](/docs/assets/update_accommodation_response.png)
 
 Validate the updated data in the database.  
 
-![update_accommodation_db](/assets/update_accommodation_db.png)
+![update_accommodation_db](/docs/assets/update_accommodation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -205,12 +205,12 @@ Validate the updated data in the database.
 **Test Execution:**  
 Enter the filter parameters in the Postman URL and send the GET request.  
 
-![search_accommodation_filters_request](/assets/search_accommodation_filters_request.png)
+![search_accommodation_filters_request](/docs/assets/search_accommodation_filters_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![search_accommodation_filters_response](/assets/search_accommodation_filters_response.png)
+![search_accommodation_filters_response](/docs/assets/search_accommodation_filters_response.png)
 
 Validate the data in the database (ensure filters match).  
 
@@ -239,16 +239,16 @@ Validate the data in the database (ensure filters match).
 **Test Execution:**  
 Enter the ID in Postman and send the DELETE request.  
 
-![delete_accommodation_request](/assets/delete_accommodation_request.png)
+![delete_accommodation_request](/docs/assets/delete_accommodation_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![delete_accommodation_response](/assets/delete_accommodation_response.png)
+![delete_accommodation_response](/docs/assets/delete_accommodation_response.png)
 
 Validate the data in the database (ensure isDeleted = 1).  
 
-![delete_accommodation_db](/assets/delete_accommodation_db.png)
+![delete_accommodation_db](/docs/assets/delete_accommodation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -292,12 +292,12 @@ Validate the data in the database (ensure isDeleted = 1).
 **Test Execution:**  
 Enter the pagination parameters in the Postman URL and send the GET request.
 
-![list_accommodations_request](/assets/list_accommodations_request.png)
+![list_accommodations_request](/docs/assets/list_accommodations_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![list_accommodations_response](/assets/list_accommodations_response.png)
+![list_accommodations_response](/docs/assets/list_accommodations_response.png)
 
 Validate the data in the database (ensure only accommodations with isDeleted = false are listed).  
 

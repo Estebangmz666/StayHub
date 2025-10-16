@@ -6,7 +6,6 @@ import edu.uniquindio.stayhub.api.dto.amenity.AmenityUpdateDTO;
 import edu.uniquindio.stayhub.api.service.AmenityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -47,6 +53,7 @@ public class AmenityController {
     public ResponseEntity<AmenityResponseDTO> createAmenity(
             @Valid @RequestBody AmenityRequestDTO amenityRequestDTO) {
         LOGGER.info("Request to create new amenity: {}", amenityRequestDTO.getName());
+        LOGGER.info("Request body: {}", amenityRequestDTO);
         AmenityResponseDTO createdAmenity = amenityService.createAmenity(amenityRequestDTO);
         return new ResponseEntity<>(createdAmenity, HttpStatus.CREATED);
     }

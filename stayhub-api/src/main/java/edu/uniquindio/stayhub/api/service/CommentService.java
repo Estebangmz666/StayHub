@@ -90,7 +90,7 @@ public class CommentService {
         }
         return commentRepository.findByUserIdAndDeletedFalse(userId)
                 .stream()
-                .map(commentMapper::toResponseDto) // Corregido: toResponseDto
+                .map(commentMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
