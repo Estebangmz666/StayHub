@@ -35,14 +35,14 @@
 **Test Execution:**  
 
 Enter the data to create a new comment in Postman and send the POST request with a valid JWT token.  
-![create_comment_body](/docs/assets/create_comment_body.png)
-![create_comment_headers](/docs/assets/create_comment_headers.png)
+![create_comment_body](/documentation/assets/create_comment_body.png)
+![create_comment_headers](/documentation/assets/create_comment_headers.png)
 
 
 **Obtained Result:**  
 Received the expected HTTP 201 code.
 
-![create_comment_response](/docs/assets/create_comment_response.png)
+![create_comment_response](/documentation/assets/create_comment_response.png)
 
 Validate the created data in the database (comment table in MariaDB).  
 
@@ -80,12 +80,12 @@ Validate the created data in the database (comment table in MariaDB).
 **Test Execution:**  
 Enter the accommodation ID in Postman and send the GET request.
 
-![get_comments_by_accommodation_request](/docs/assets/get_comments_by_accommodation_request.png)
+![get_comments_by_accommodation_request](/documentation/assets/get_comments_by_accommodation_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![get_comments_by_accommodation_response](/docs/assets/get_comments_by_accommodation_response.png)
+![get_comments_by_accommodation_response](/documentation/assets/get_comments_by_accommodation_response.png)
 
 Validate the data in the database (ensure only isActive = true records for the accommodation).  
 
@@ -128,12 +128,12 @@ Validate the data in the database (ensure only isActive = true records for the a
 **Test Execution:**  
 Enter the accommodation ID and pagination parameters in Postman and send the GET request.
 
-![get_paginated_comments_by_accommodation_request](/docs/assets/get_paginated_comments_by_accommodation_request.png)
+![get_paginated_comments_by_accommodation_request](/documentation/assets/get_paginated_comments_by_accommodation_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![get_paginated_comments_by_accommodation_response](/docs/assets/get_paginated_comments_by_accommodation_response.png)
+![get_paginated_comments_by_accommodation_response](/documentation/assets/get_paginated_comments_by_accommodation_response.png)
 
 Validate the data in the database (ensure pagination matches active records).  
 
@@ -171,12 +171,12 @@ Validate the data in the database (ensure pagination matches active records).
 **Test Execution:**  
 Enter the user ID in Postman and send the GET request with a valid JWT token.
 
-![get_comments_by_user_request](/docs/assets/get_comments_by_user_request.png)
+![get_comments_by_user_request](/documentation/assets/get_comments_by_user_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![get_comments_by_user_response](/docs/assets/get_comments_by_user_response.png)
+![get_comments_by_user_response](/documentation/assets/get_comments_by_user_response.png)
 
 
 Validate the data in the database (ensure only the user’s active comments).  
@@ -204,12 +204,12 @@ Validate the data in the database (ensure only the user’s active comments).
 **Test Execution:**  
 Enter the accommodation ID in Postman and send the GET request.
 
-![get_average_rating_request](/docs/assets/get_average_rating_request.png)
+![get_average_rating_request](/documentation/assets/get_average_rating_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![get_average_rating_response](/docs/assets/get_average_rating_response.png)
+![get_average_rating_response](/documentation/assets/get_average_rating_response.png)
 
 Validate the calculation in the database (average of ratings where isActive = true).  
 
@@ -236,12 +236,12 @@ Validate the calculation in the database (average of ratings where isActive = tr
 **Test Execution:**  
 Enter the accommodation ID in Postman and send the GET request.
 
-![get_comment_count_request](/docs/assets/get_comment_count_request.png)
+![get_comment_count_request](/documentation/assets/get_comment_count_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![get_comment_count_response](/docs/assets/get_comment_count_response.png)
+![get_comment_count_response](/documentation/assets/get_comment_count_response.png)
 
 Validate the count in the database (count of records where isActive = true).  
 
@@ -281,17 +281,17 @@ Validate the count in the database (count of records where isActive = true).
 **Test Execution:**  
 Enter the ID and updated data in Postman and send the PUT request with a valid JWT token.
 
-![update_comment_body](/docs/assets/update_comment_body.png)
-![update_comment_headers](/docs/assets/update_comment_headers.png)
+![update_comment_body](/documentation/assets/update_comment_body.png)
+![update_comment_headers](/documentation/assets/update_comment_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![update_comment_response](/docs/assets/update_comment_response.png)
+![update_comment_response](/documentation/assets/update_comment_response.png)
 
 Validate the updated data in the database.
 
-![update_comment_db](/docs/assets/update_comment_db.png)
+![update_comment_db](/documentation/assets/update_comment_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -313,16 +313,16 @@ Validate the updated data in the database.
 **Test Execution:**  
 Enter the ID in Postman and send the DELETE request with a valid JWT token.
 
-![delete_comment_request](/docs/assets/delete_comment_request.png)
+![delete_comment_request](/documentation/assets/delete_comment_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 204 code.
 
-![delete_comment_response](/docs/assets/delete_comment_response.png)
+![delete_comment_response](/documentation/assets/delete_comment_response.png)
 
 Validate the data in the database (ensure isActive = false for the specified ID).
 
-![delete_comment_db](/docs/assets/delete_comment_db.png)
+![delete_comment_db](/documentation/assets/delete_comment_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -359,17 +359,17 @@ Validate the data in the database (ensure isActive = false for the specified ID)
 **Test Execution:**  
 Enter the ID and reply data in Postman and send the POST request with a valid JWT token for a host.
 
-![reply_to_comment_body](/docs/assets/reply_to_comment_body.png)
-![reply_to_comment_headers](/docs/assets/reply_to_comment_headers.png)
+![reply_to_comment_body](/documentation/assets/reply_to_comment_body.png)
+![reply_to_comment_headers](/documentation/assets/reply_to_comment_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 201 code.  
 
-![reply_to_comment_response](/docs/assets/reply_to_comment_response.png)
+![reply_to_comment_response](/documentation/assets/reply_to_comment_response.png)
 
 Validate the updated data in the database (ensure reply and repliedBy are recorded).
 
-![reply_to_comment_db](/docs/assets/reply_to_comment_db.png)
+![reply_to_comment_db](/documentation/assets/reply_to_comment_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  

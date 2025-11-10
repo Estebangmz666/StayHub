@@ -13,8 +13,8 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "docs",
-            "baseHref": "/Stayhub",
+            "outputPath": "docs/browser",
+            "baseHref": "/StayHub",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",

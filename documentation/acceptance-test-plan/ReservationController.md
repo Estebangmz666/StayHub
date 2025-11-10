@@ -40,17 +40,17 @@
 **Test Execution:**  
 Enter the data to create a new reservation in Postman and send the POST request with a valid JWT token.  
 
-![create_reservation_body](/docs/assets/create_reservation_body.png)
-![create_reservation_headers](/docs/assets/create_reservation_headers.png)
+![create_reservation_body](/documentation/assets/create_reservation_body.png)
+![create_reservation_headers](/documentation/assets/create_reservation_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 201 code.
 
-![create_reservation_response](/docs/assets/create_reservation_response.png)
+![create_reservation_response](/documentation/assets/create_reservation_response.png)
 
 Validate the created data in the database (reservation table in MariaDB).
 
-![create_reservation_db](/docs/assets/create_reservation_db.png)
+![create_reservation_db](/documentation/assets/create_reservation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -87,12 +87,12 @@ Validate the created data in the database (reservation table in MariaDB).
 **Test Execution:**  
 Enter the reservation ID in Postman and send the GET request with a valid JWT token.
 
-![get_reservation_by_id_request](/docs/assets/get_reservation_by_id_request.png)
+![get_reservation_by_id_request](/documentation/assets/get_reservation_by_id_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![get_reservation_by_id_response](/docs/assets/get_reservation_by_id_response.png)
+![get_reservation_by_id_response](/documentation/assets/get_reservation_by_id_response.png)
 
 Validate the data in the database (ensure it matches the record).  
 
@@ -136,17 +136,17 @@ Validate the data in the database (ensure it matches the record).
 **Test Execution:**  
 Enter the ID and updated data in Postman and send the PUT request with a valid JWT token.
 
-![update_reservation_body](/docs/assets/update_reservation_body.png)
-![update_reservation_headers](/docs/assets/update_reservation_headers.png)
+![update_reservation_body](/documentation/assets/update_reservation_body.png)
+![update_reservation_headers](/documentation/assets/update_reservation_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![update_reservation_response](/docs/assets/update_reservation_response.png)
+![update_reservation_response](/documentation/assets/update_reservation_response.png)
 
 Validate the updated data in the database (ensure status is updated).
 
-![update_reservation_db](/docs/assets/update_reservation_db.png)
+![update_reservation_db](/documentation/assets/update_reservation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -173,16 +173,16 @@ Validate the updated data in the database (ensure status is updated).
 **Test Execution:**  
 Enter the ID in Postman and send the DELETE request with a valid JWT token.
 
-![cancel_reservation_request](/docs/assets/cancel_reservation_request.png)
+![cancel_reservation_request](/documentation/assets/cancel_reservation_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![cancel_reservation_response](/docs/assets/cancel_reservation_response.png)
+![cancel_reservation_response](/documentation/assets/cancel_reservation_response.png)
 
 Validate the data in the database (ensure isDeleted = true and status = CANCELLED).
 
-![cancel_reservation_db](/docs/assets/cancel_reservation_db.png)
+![cancel_reservation_db](/documentation/assets/cancel_reservation_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -226,12 +226,12 @@ Validate the data in the database (ensure isDeleted = true and status = CANCELLE
 **Test Execution:**  
 Enter the pagination parameters and optional status in Postman and send the GET request with a valid JWT token.
 
-![list_user_reservations_request](/docs/assets/list_user_reservations_request.png)
+![list_user_reservations_request](/documentation/assets/list_user_reservations_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![list_user_reservations_response](/docs/assets/list_user_reservations_response.png)
+![list_user_reservations_response](/documentation/assets/list_user_reservations_response.png)
 
 Validate the data in the database (ensure it matches the user’s active reservations).  
 
@@ -277,12 +277,12 @@ Validate the data in the database (ensure it matches the user’s active reserva
 **Test Execution:**  
 Enter the accommodation ID, pagination parameters, and optional status in Postman and send the GET request with a valid JWT token for the host.
 
-![list_accommodation_reservations_request](/docs/assets/list_accommodation_reservations_request.png)
+![list_accommodation_reservations_request](/documentation/assets/list_accommodation_reservations_request.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.
 
-![list_accommodation_reservations_response](/docs/assets/list_accommodation_reservations_response.png)
+![list_accommodation_reservations_response](/documentation/assets/list_accommodation_reservations_response.png)
 
 Validate the data in the database (ensure it matches the accommodation’s active reservations).  
 

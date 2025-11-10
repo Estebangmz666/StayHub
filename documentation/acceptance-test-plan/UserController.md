@@ -39,16 +39,16 @@
 **Test Execution:**  
 Enter the data to register a new user in Postman and send the POST request.  
 
-![signup_test](/docs/assets/signup_test.png)
+![signup_test](/documentation/assets/signup_test.png)
 
 **Obtained Result:**  
 Received the expected HTTP 201 code.  
 
-![signup_response](/docs/assets/signup_response.png)
+![signup_response](/documentation/assets/signup_response.png)
 
 Validate the created data in the database (user table in MariaDB).  
 
-![signup_db](/docs/assets/signup_db.png)
+![signup_db](/documentation/assets/signup_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -81,12 +81,12 @@ Validate the created data in the database (user table in MariaDB).
 **Test Execution:**  
 Enter the login credentials in Postman and send the POST request.  
 
-![login_test](/docs/assets/login_test.png)
+![login_test](/documentation/assets/login_test.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![login_response](/docs/assets/login_response.png)
+![login_response](/documentation/assets/login_response.png)
 
 Validate the token by using it in a later authenticated request (e.g., getProfile).  
 
@@ -131,18 +131,18 @@ Validate the token by using it in a later authenticated request (e.g., getProfil
 **Test Execution:**  
 Enter the user ID and updated data in Postman and send the PUT request with a valid JWT token.  
 
-![update_body](/docs/assets/update_body.png)
-![update_headers](/docs/assets/update_headers.png)
+![update_body](/documentation/assets/update_body.png)
+![update_headers](/documentation/assets/update_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![update_response](/docs/assets/update_response.png)
+![update_response](/documentation/assets/update_response.png)
 
 
 Validate the updated data in the database.  
 
-![update_db](/docs/assets/update_db.png)
+![update_db](/documentation/assets/update_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -169,16 +169,16 @@ Validate the updated data in the database.
 **Test Execution:**  
 Enter the email in Postman and send the POST request. Ensure the rate limit is not exceeded.  
 
-![reset_test](/docs/assets/reset_test.png)
+![reset_test](/documentation/assets/reset_test.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![reset_response](/docs/assets/reset_response.png)
+![reset_response](/documentation/assets/reset_response.png)
 
 Validate the token generation in the database (password_reset_token table in MariaDB).  
 
-![reset_db](/docs/assets/reset_db.png)
+![reset_db](/documentation/assets/reset_db.png)
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -211,16 +211,16 @@ Validate the token generation in the database (password_reset_token table in Mar
 **Test Execution:**  
 Enter the token and new password in Postman and send the POST request.  
 
-![reset_body](/docs/assets/reset_body.png)
+![reset_body](/documentation/assets/reset_body.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![reset_response2](/docs/assets/reset_response2.png)
+![reset_response2](/documentation/assets/reset_response2.png)
 
 Validate the password update in the database (ensure the hashed password is updated).  
 
-![reset_db2](/docs/assets/reset_db2.png) 
+![reset_db2](/documentation/assets/reset_db2.png) 
 
 **Test Passed? (Yes/No):** Yes  
 **Test Status (Accepted / Rejected):** Accepted  
@@ -255,13 +255,13 @@ Validate the password update in the database (ensure the hashed password is upda
 **Test Execution:**  
 Enter the user ID in Postman and send the GET request with a valid JWT token.  
 
-![profile_body](/docs/assets/profile_body.png) 
-![profile_headers](/docs/assets/profile_headers.png)
+![profile_body](/documentation/assets/profile_body.png) 
+![profile_headers](/documentation/assets/profile_headers.png)
 
 **Obtained Result:**  
 Received the expected HTTP 200 code.  
 
-![profile_response](/docs/assets/profile_response.png)
+![profile_response](/documentation/assets/profile_response.png)
 
 Validate the data in the database (ensure it matches the record).  
 
