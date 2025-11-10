@@ -1,6 +1,7 @@
 package edu.uniquindio.stayhub.api.repository;
 
 import edu.uniquindio.stayhub.api.model.Accommodation;
+import edu.uniquindio.stayhub.api.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -104,4 +105,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
             @Param("maxPrice") BigDecimal maxPrice,
             @Param("amenityIds") List<Long> amenityIds,
             Pageable pageable);
+
+    Page<Accommodation> findByHostAndDeletedFalse(User host, Pageable pageable);
 }

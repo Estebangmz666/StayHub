@@ -1,41 +1,51 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { InputComponent } from '../atoms/input';
-import { LabelComponent } from '../atoms/label';
-import { ErrorMessageComponent } from '../atoms/error-message';
+import { Component, Input, forwardRef } from '@angular/core';
+import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {Label} from '../../atoms/label/label';
+import {InputComponent} from '../../atoms/input/input';
+import {ErrorText} from '../../atoms/error-text/error-text';
 
 @Component({
   selector: 'app-form-field',
   standalone: true,
-  imports: [CommonModule, InputComponent, LabelComponent, ErrorMessageComponent],
-  template: `
-    <div class="form-field">
-      @if (label) {
-        <app-label [for]="id" [text]="label"></app-label>
-      }
-      <app-input
-        [id]="id"
-        [type]="type"
-        [placeholder]="placeholder"
-        [value]="value"
-        [error]="!!error"
-        (valueChange)="onValueChange($event)"
-      ></app-input>
-      <app-error-message [message]="error"></app-error-message>
-    </div>
-  `,
-  styleUrls: ['./form-field.css']
+  templateUrl: './form-field.html',
+  styleUrls: ['./form-field.css'],
+  imports: [
+    Label,
+    InputComponent,
+    FormsModule,
+    ErrorText
+  ],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => FormField),
+    multi: true
+  }]
 })
-export class FormFieldComponent {
-  @Input() label = '';
-  @Input() type = 'text';
-  @Input() placeholder = '';
-  @Input() error = '';
-  @Input() value = '';
+export class FormField implements ControlValueAccessor {
+  @Input() label: string = '';
+  @Input() type: string = 'text';
+  @Input() placeholder: string = '';
+  @Input() required: boolean = false;
+  @Input() errorMessage: string = '';
 
-  id = `field-${Math.random().toString(36).substring(2, 9)}`;
+  value: string = '';
+  onChange: any = () => {};
+  onTouched: any = () => {};
 
-  onValueChange(val: string) {
-    this.value = val;
+  onValueChange(newValue: string): void {
+    this.value = newValue;
+    this.onChange(newValue);
+  }
+
+  writeValue(value: any): void {
+    this.value = value || '';
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
   }
 }

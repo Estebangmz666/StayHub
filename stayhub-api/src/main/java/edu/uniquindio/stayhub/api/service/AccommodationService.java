@@ -6,6 +6,7 @@ import edu.uniquindio.stayhub.api.dto.accommodation.AccommodationUpdateDTO;
 import edu.uniquindio.stayhub.api.dto.notification.NotificationRequestDTO;
 import edu.uniquindio.stayhub.api.exception.AccessDeniedException;
 import edu.uniquindio.stayhub.api.exception.AccommodationNotFoundException;
+import edu.uniquindio.stayhub.api.exception.UserNotFoundException;
 import edu.uniquindio.stayhub.api.mapper.AccommodationMapper;
 import edu.uniquindio.stayhub.api.model.*;
 import edu.uniquindio.stayhub.api.repository.AccommodationRepository;
@@ -231,4 +232,13 @@ public class AccommodationService {
         return result.map(accommodationMapper::toResponseDTO);
     }
 
+    public Page<AccommodationResponseDTO> getAccommodationsByHost(String username, Pageable pageable) {
+        User host = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+
+        Page<Accommodation> accommodations = accommodationRepository
+                .findByHostAndDeletedFalse(host, pageable);
+
+        return accommodations.map(accommodationMapper::toResponseDTO);
+    }
 }

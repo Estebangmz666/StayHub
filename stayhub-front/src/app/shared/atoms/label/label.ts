@@ -1,14 +1,13 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-label',
   standalone: true,
-  imports: [CommonModule],
-  template: `<label [for]="for">{{ text }}</label>`,
+  templateUrl: './label.html',
+  imports: [],
   styleUrls: ['./label.css']
 })
-export class LabelComponent {
-  @Input() for = '';
-  @Input() text = '';
+export class Label{
+  @Input() text: string = '';
+  @Input() required: boolean = false;
 }

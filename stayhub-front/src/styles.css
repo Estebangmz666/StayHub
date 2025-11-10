@@ -93,3 +93,14 @@ a:hover { text-decoration: underline; }
   border-color: var(--color-border);
 }
 .btn-ghost:hover { background: var(--color-accent-soft); }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+input, button, select, textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}

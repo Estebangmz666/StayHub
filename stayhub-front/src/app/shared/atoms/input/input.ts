@@ -1,30 +1,50 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, forwardRef } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-input',
   standalone: true,
-  imports: [CommonModule],
-  template: `<input
-    [id]="id"
-    [type]="type"
-    [placeholder]="placeholder"
-    [value]="value"
-    (input)="onInput($event)"
-    [class.error]="error"
-  />`,
-  styleUrls: ['./input.css']
+  templateUrl: './input.html',
+  styleUrls: ['./input.css'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => InputComponent),
+    multi: true
+  }]
 })
-export class InputComponent {
-  @Input() type = 'text';
-  @Input() placeholder = '';
-  @Input() value = '';
-  @Input() error = false;
-  @Output() valueChange = new EventEmitter<string>();
+export class InputComponent implements ControlValueAccessor {
+  @Input() type: string = 'text';
+  @Input() placeholder: string = '';
+  @Input() disabled: boolean = false;
+  @Input() hasError: boolean = false;
 
-  id = `input-${Math.random().toString(36).substring(2, 9)}`;
+  value: string = '';
 
-  onInput(event: Event) {
-    this.valueChange.emit((event.target as HTMLInputElement).value);
+  onChange: any = () => {};
+  onTouched: any = () => {};
+
+  onInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.value = input.value;
+    this.onChange(this.value);
+  }
+
+  writeValue(value: any): void {
+    this.value = value || '';
+  }
+
+  // Angular registra la función para notificar cambios
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  // Angular registra la función para notificar cuando se toca
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  // Angular llama esto para habilitar/deshabilitar
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 }

@@ -1,1 +1,9 @@
-<p>button works!</p>
+<button
+  [type]="type"
+  [disabled]="disabled"
+  [class]="variant"
+  (click)="onClick()"
+  class="btn"
+>
+  {{ label }}
+</button>

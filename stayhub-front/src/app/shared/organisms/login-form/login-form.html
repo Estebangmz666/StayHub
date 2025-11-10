@@ -1,0 +1,42 @@
+<div class="login-form">
+  <app-form-field
+    label="Correo electrónico"
+    type="email"
+    placeholder="johndoe@gmail.com"
+    [required]="true"
+    [errorMessage]="errors.email || ''"
+    [(ngModel)]="credentials.email"
+  ></app-form-field>
+
+  <app-password-field
+    label="Contraseña"
+    placeholder="••••••••"
+    [required]="true"
+    [errorMessage]="errors.password || ''"
+    [(ngModel)]="credentials.password"
+  ></app-password-field>
+
+  <div class="options-row">
+    <app-link
+      text="¿Olvidaste tu contraseña?"
+      (clicked)="onForgotPassword()"
+    ></app-link>
+  </div>
+
+  <app-button
+    [label]="isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'"
+    variant="primary"
+    [disabled]="isLoading"
+    (clicked)="handleLogin()"
+  ></app-button>
+
+  <div class="divider">
+    <span>o</span>
+  </div>
+
+  <app-button
+    label="Crear una cuenta"
+    variant="secondary"
+    (clicked)="onSignUp()"
+  ></app-button>
+</div>

@@ -1,0 +1,207 @@
+<div class="register-form">
+
+  <!-- Selector de Rol (Radio buttons estilizados) -->
+  <div class="role-selector">
+    <h3 class="role-title">¿Cómo quieres usar Stayhub?</h3>
+
+    <div class="role-options">
+      <!-- Opción GUEST -->
+      <label
+        class="role-option"
+        [class.selected]="formData.role === Role.GUEST"
+      >
+        <input
+          type="radio"
+          name="role"
+          [value]="Role.GUEST"
+          [(ngModel)]="formData.role"
+          (change)="onRoleChange(Role.GUEST)"
+        />
+        <div class="role-card">
+          <span class="role-icon">{{ constants.ROLES.GUEST.icon }}</span>
+          <div class="role-info">
+            <span class="role-label">{{ constants.ROLES.GUEST.label }}</span>
+            <span class="role-description">{{ constants.ROLES.GUEST.description }}</span>
+          </div>
+        </div>
+      </label>
+
+      <!-- Opción HOST -->
+      <label
+        class="role-option"
+        [class.selected]="formData.role === Role.HOST"
+      >
+        <input
+          type="radio"
+          name="role"
+          [value]="Role.HOST"
+          [(ngModel)]="formData.role"
+          (change)="onRoleChange(Role.HOST)"
+        />
+        <div class="role-card">
+          <span class="role-icon">{{ constants.ROLES.HOST.icon }}</span>
+          <div class="role-info">
+            <span class="role-label">{{ constants.ROLES.HOST.label }}</span>
+            <span class="role-description">{{ constants.ROLES.HOST.description }}</span>
+          </div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Campos comunes (GUEST y HOST) -->
+  <div class="form-section">
+    <h4 class="section-title">Información personal</h4>
+
+    <!-- Nombre completo -->
+    <app-form-field
+      label="Nombre completo"
+      type="text"
+      placeholder="Juan Pérez"
+      [required]="true"
+      [errorMessage]="errors.name || ''"
+      [(ngModel)]="formData.name"
+    ></app-form-field>
+
+    <!-- Email -->
+    <app-form-field
+      label="Correo electrónico"
+      type="email"
+      placeholder="correo@ejemplo.com"
+      [required]="true"
+      [errorMessage]="errors.email || ''"
+      [(ngModel)]="formData.email"
+    ></app-form-field>
+
+    <!-- Teléfono -->
+    <app-form-field
+      label="Teléfono"
+      type="tel"
+      placeholder="+57 3001234567"
+      [required]="true"
+      [errorMessage]="errors.phoneNumber || ''"
+      [(ngModel)]="formData.phoneNumber"
+      (ngModelChange)="onPhoneInput()"
+    ></app-form-field>
+
+    <!-- Fecha de nacimiento -->
+    <div class="form-field-with-helper">
+      <app-form-field
+        label="Fecha de nacimiento"
+        type="date"
+        [required]="true"
+        [errorMessage]="errors.birthDate || ''"
+        [(ngModel)]="formData.birthDate"
+      ></app-form-field>
+      @if (getAge() !== null) {
+        <p class="helper-text">
+          Edad: {{ getAge() }} años
+        </p>
+      }
+    </div>
+
+    <!-- Contraseña -->
+    <app-password-field
+      label="Contraseña"
+      placeholder="Contraseña"
+      [required]="true"
+      [errorMessage]="errors.password || ''"
+      [(ngModel)]="formData.password"
+    ></app-password-field>
+    <p class="password-hint">{{ constants.PASSWORD_REQUIREMENTS }}</p>
+
+    <!-- Confirmar contraseña -->
+    <app-password-field
+      label="Confirmar contraseña"
+      placeholder="Confirmar contraseña"
+      [required]="true"
+      [errorMessage]="errors.confirmPassword || ''"
+      [(ngModel)]="formData.confirmPassword"
+    ></app-password-field>
+  </div>
+
+  <!-- Campos adicionales para HOST -->
+  @if (formData.role === Role.HOST) {
+    <div class="form-section host-section">
+      <h4 class="section-title">Información de anfitrión</h4>
+
+      <!-- Foto de perfil -->
+      <app-form-field
+        label="URL de foto de perfil (opcional)"
+        type="url"
+        placeholder="https://ejemplo.com/foto.jpg"
+        [required]="false"
+        [errorMessage]="errors.profilePicture || ''"
+        [(ngModel)]="formData.profilePicture"
+      ></app-form-field>
+
+      <!-- Descripción -->
+      <div class="form-field">
+        <app-label [text]="'Descripción (opcional)'" [required]="false"></app-label>
+        <textarea
+          [(ngModel)]="formData.description"
+          placeholder="Cuéntanos sobre ti como anfitrión..."
+          class="textarea-field"
+          [class.error]="!!errors.description"
+          rows="4"
+          maxlength="500"
+        ></textarea>
+        <div class="char-count">
+          {{ formData.description?.length || 0 }} / 500
+        </div>
+        <app-error-text [message]="errors.description || ''"></app-error-text>
+      </div>
+
+      <!-- Documentos legales -->
+      <div class="legal-docs-section">
+        <p class="section-description">
+          <strong>Documentos legales:</strong> Agrega URLs a tus documentos de identificación, certificados, etc.
+        </p>
+
+        <app-form-field
+          label="Documento 1 (opcional)"
+          type="url"
+          placeholder="https://ejemplo.com/documento1.pdf"
+          [required]="false"
+          [errorMessage]="errors.legalDocument1 || ''"
+          [(ngModel)]="formData.legalDocument1"
+        ></app-form-field>
+
+        <app-form-field
+          label="Documento 2 (opcional)"
+          type="url"
+          placeholder="https://ejemplo.com/documento2.pdf"
+          [required]="false"
+          [errorMessage]="errors.legalDocument2 || ''"
+          [(ngModel)]="formData.legalDocument2"
+        ></app-form-field>
+
+        <app-form-field
+          label="Documento 3 (opcional)"
+          type="url"
+          placeholder="https://ejemplo.com/documento3.pdf"
+          [required]="false"
+          [errorMessage]="errors.legalDocument3 || ''"
+          [(ngModel)]="formData.legalDocument3"
+        ></app-form-field>
+      </div>
+    </div>
+  }
+
+  <!-- Botón de registro -->
+  <app-button
+    [label]="isLoading ? 'Registrando...' : 'Crear cuenta'"
+    variant="primary"
+    [disabled]="isLoading"
+    (clicked)="handleSubmit()"
+  ></app-button>
+
+  <!-- Link para ir al login -->
+  <div class="login-link">
+    <span class="text-gray">¿Ya tienes cuenta?</span>
+    <app-link
+      text="Iniciar sesión"
+      (clicked)="onGoToLogin()"
+    ></app-link>
+  </div>
+</div>

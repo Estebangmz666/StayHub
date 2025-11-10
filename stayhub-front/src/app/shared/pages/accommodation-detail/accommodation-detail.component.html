@@ -1,0 +1,246 @@
+<div class="detail-page">
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando detalles...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error && !isLoading) {
+    <div class="error-container">
+      <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3>No pudimos cargar la propiedad</h3>
+      <p>{{ error }}</p>
+      <button class="btn-primary" (click)="goBack()">
+        Volver a la lista
+      </button>
+    </div>
+  }
+
+  <!-- Contenido -->
+  @if (accommodation && !isLoading) {
+    <div class="detail-content">
+
+      <!-- Header con botón volver -->
+      <div class="detail-header">
+        <button class="back-btn" (click)="goBack()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Volver
+        </button>
+
+        <button class="share-btn" (click)="shareAccommodation()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          Compartir
+        </button>
+      </div>
+
+      <!-- Galería de imágenes -->
+      <div class="gallery-section">
+        <div class="main-image-container" (click)="openGalleryModal()">
+          <img
+            [src]="allImages[currentImageIndex]"
+            [alt]="accommodation.title"
+            class="main-image"
+          />
+          <button class="gallery-expand-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+            Ver todas las fotos
+          </button>
+        </div>
+
+        <!-- Thumbnails -->
+        @if (allImages.length > 1) {
+          <div class="thumbnails">
+            @for (image of allImages; track $index) {
+              <button
+                class="thumbnail"
+                [class.active]="$index === currentImageIndex"
+                (click)="selectImage($index)"
+              >
+                <img [src]="image" [alt]="'Imagen ' + ($index + 1)" />
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Controles de navegación -->
+        @if (allImages.length > 1) {
+          <button
+            class="gallery-nav gallery-prev"
+            (click)="previousImage()"
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <button
+            class="gallery-nav gallery-next"
+            (click)="nextImage()"
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        }
+      </div>
+
+      <!-- Contenido principal -->
+      <div class="main-content-grid">
+
+        <!-- Columna izquierda: Info principal -->
+        <div class="info-column">
+
+          <!-- Título y ubicación -->
+          <div class="title-section">
+            <h1 class="property-title">{{ accommodation.title }}</h1>
+            <div class="location">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ accommodation.city }} - {{ accommodation.locationDescription }}</span>
+            </div>
+            <div class="capacity">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+              </svg>
+              <span>{{ capacityText }}</span>
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <div class="description-section">
+            <h2 class="section-title">Descripción</h2>
+            <p class="description-text">{{ accommodation.description }}</p>
+          </div>
+
+          <!-- Amenidades -->
+          @if (hasAmenities) {
+            <div class="amenities-section">
+              <h2 class="section-title">Amenidades</h2>
+              <div class="amenities-grid">
+                @for (amenity of accommodation.amenities; track amenity.name) {
+                  <div class="amenity-item">
+                    <span class="amenity-icon">{{ getAmenityIcon(amenity.name) }}</span>
+                    <span class="amenity-name">{{ amenity.name }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Ubicación -->
+          <div class="location-section">
+            <h2 class="section-title">Ubicación</h2>
+            <div class="location-info">
+              <p><strong>Ciudad:</strong> {{ accommodation.city }}</p>
+              <p><strong>Descripción:</strong> {{ accommodation.locationDescription }}</p>
+              <p class="coordinates">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                </svg>
+                {{ accommodation.latitude }}, {{ accommodation.longitude }}
+              </p>
+            </div>
+            <!-- Aquí podrías agregar un mapa de Google Maps -->
+          </div>
+
+        </div>
+
+        <!-- Columna derecha: Card de reserva -->
+        <div class="booking-column">
+          <div class="booking-card">
+
+            <!-- Precio -->
+            <div class="price-section">
+              <span class="price">{{ utils.formatPrice(accommodation.pricePerNight) }}</span>
+              <span class="price-label">/ noche</span>
+            </div>
+
+            <!-- Botón de reserva -->
+            <button class="btn-reserve" (click)="makeReservation()">
+              Reservar ahora
+            </button>
+
+            <!-- Contactar anfitrión -->
+            <button class="btn-contact" (click)="contactHost()">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              Contactar al anfitrión
+            </button>
+
+            <!-- Info adicional -->
+            <div class="booking-info">
+              <p>
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Cancelación gratuita
+              </p>
+              <p>
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Confirmación inmediata
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  }
+
+  <!-- Modal de galería (fullscreen) -->
+  @if (showGalleryModal) {
+    <div class="gallery-modal" (click)="closeGalleryModal()">
+      <button class="modal-close">
+        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <img
+          [src]="allImages[currentImageIndex]"
+          [alt]="accommodation?.title"
+          class="modal-image"
+        />
+
+        <button class="modal-nav modal-prev" (click)="previousImage(); $event.stopPropagation()">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <button class="modal-nav modal-next" (click)="nextImage(); $event.stopPropagation()">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        <div class="modal-counter">
+          {{ currentImageIndex + 1 }} / {{ allImages.length }}
+        </div>
+      </div>
+    </div>
+  }
+</div>

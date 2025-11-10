@@ -1,0 +1,99 @@
+.register-page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #F9FAFB, #E5E7EB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.register-container {
+  width: 100%;
+  max-width: 42rem; /* Más ancho que el login por los campos extra */
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background-color: #1E88E5;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.logo-icon {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #6B7280;
+  font-size: 1rem;
+}
+
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Scrollbar personalizada */
+.card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 10px;
+}
+
+.card::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 10px;
+}
+
+.card::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  .register-page {
+    padding: 1rem 0.5rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+    max-height: 85vh;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

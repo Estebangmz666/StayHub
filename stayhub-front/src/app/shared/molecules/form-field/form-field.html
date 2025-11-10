@@ -1,1 +1,11 @@
-<p>form-field works!</p>
+<div class="form-field">
+  <app-label [text]="label" [required]="required"></app-label>
+  <app-input
+    [type]="type"
+    [placeholder]="placeholder"
+    [hasError]="!!errorMessage"
+    [(ngModel)]="value"
+    (ngModelChange)="onValueChange($event)"
+  ></app-input>
+  <app-error-text [message]="errorMessage"></app-error-text>
+</div>

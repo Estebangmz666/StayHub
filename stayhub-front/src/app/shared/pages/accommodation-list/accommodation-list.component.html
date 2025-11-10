@@ -1,0 +1,154 @@
+<div class="accommodations-page">
+
+  <!-- Header con filtros -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Explora alojamientos</h1>
+      <p class="page-subtitle">
+        Encuentra el lugar perfecto para tu próxima aventura
+      </p>
+    </div>
+
+    <button class="filter-toggle-btn" (click)="toggleFilters()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+      </svg>
+      <span>Filtros</span>
+      <span *ngIf="hasFilters" class="filter-badge">{{ (filters.city ? 1 : 0) + (filters.minCapacity ? 1 : 0) + (filters.maxPrice ? 1 : 0) }}</span>
+    </button>
+  </div>
+
+  <!-- Panel de filtros (colapsable) -->
+  <div class="filters-panel" [class.show]="showFilters">
+    <div class="filters-content">
+
+      <div class="filter-group">
+        <label class="filter-label">Ciudad</label>
+        <select [(ngModel)]="filters.city" class="filter-select">
+          <option [ngValue]="undefined">Todas las ciudades</option>
+          <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Mínimo de huéspedes</label>
+        <input
+          type="number"
+          [(ngModel)]="filters.minCapacity"
+          placeholder="Ej: 2"
+          min="1"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Precio máximo por noche</label>
+        <input
+          type="number"
+          [(ngModel)]="filters.maxPrice"
+          placeholder="Ej: 200000"
+          min="0"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn-secondary" (click)="clearFilters()">
+          Limpiar
+        </button>
+        <button class="btn-primary" (click)="applyFilters()">
+          Aplicar filtros
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Resultados info -->
+  <div class="results-info" *ngIf="!isLoading && accommodations.length > 0">
+    <p>
+      Mostrando {{ accommodations.length }} de {{ totalElements }} alojamientos
+    </p>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando alojamientos...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h3>Oops! Algo salió mal</h3>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="loadAccommodations()">
+      Intentar de nuevo
+    </button>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && !error && accommodations.length === 0" class="empty-container">
+    <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    </svg>
+    <h3>No encontramos alojamientos</h3>
+    <p>Intenta ajustar los filtros o explora otras opciones</p>
+    <button *ngIf="hasFilters" class="btn-primary" (click)="clearFilters()">
+      Limpiar filtros
+    </button>
+  </div>
+
+  <!-- Grid de propiedades -->
+  <div *ngIf="!isLoading && !error && accommodations.length > 0" class="accommodations-grid">
+    <app-accommodation-card
+      *ngFor="let accommodation of accommodations"
+      [accommodation]="accommodation"
+      (cardClick)="viewAccommodation($event)"
+    ></app-accommodation-card>
+  </div>
+
+  <!-- Paginación -->
+  <div *ngIf="!isLoading && totalPages > 1" class="pagination">
+
+    <button
+      class="pagination-btn"
+      [disabled]="currentPage === 0"
+      (click)="previousPage()"
+    >
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Anterior
+    </button>
+
+    <div class="pagination-numbers">
+      <button
+        *ngFor="let page of paginationArray"
+        class="pagination-number"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)"
+      >
+        {{ page + 1 }}
+      </button>
+    </div>
+
+    <button
+      class="pagination-btn"
+      [disabled]="currentPage >= totalPages - 1"
+      (click)="nextPage()"
+    >
+      Siguiente
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+
+  </div>
+
+</div>

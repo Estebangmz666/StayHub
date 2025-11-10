@@ -183,4 +183,28 @@ public class AccommodationController {
         LOGGER.debug("Retrieved {} active accommodations", result.getTotalElements());
         return result.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "Get my accommodations", description = "Retrieves all accommodations owned by the authenticated host")
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/my-accommodations")
+    public ResponseEntity<SearchResponseDTO<AccommodationResponseDTO>> getMyAccommodations(
+            @RequestHeader("X-Username") @Parameter(description = "User email", required = true) String username,
+            @RequestParam(defaultValue = "0") @Parameter(description = "Page number") int page,
+            @RequestParam(defaultValue = "10") @Parameter(description = "Page size") int size) {
+        LOGGER.info("Retrieving accommodations for host: {}", username);
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<AccommodationResponseDTO> result = accommodationService.getAccommodationsByHost(username, pageable);
+
+        SearchResponseDTO<AccommodationResponseDTO> response = new SearchResponseDTO<>(
+                result.getContent(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements()
+        );
+
+        return result.isEmpty()
+                ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

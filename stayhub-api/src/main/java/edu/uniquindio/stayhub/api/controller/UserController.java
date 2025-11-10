@@ -169,4 +169,21 @@ public class UserController {
         LOGGER.debug("Profile fetched successfully for user ID: {}", userId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "Get user by ID", description = "Retrieves user information by ID")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = edu.uniquindio.stayhub.api.dto.auth.Error.class)))
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getUserById(
+            @PathVariable("id") @Parameter(description = "User ID", required = true) Long id) {
+        LOGGER.info("Fetching info for user ID: {}", id);
+        UserResponseDTO response = userService.getProfile(id);
+        LOGGER.debug("Info fetched successfully for user ID: {}", id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
