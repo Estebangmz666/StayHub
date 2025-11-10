@@ -1,0 +1,10 @@
+# .dockerignore
+target/
+*.log
+.git
+.gitignore
+README.md
+.dockerignore
+.mvn/
+mvnw
+mvnw.cmd
