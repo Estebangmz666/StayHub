@@ -7,6 +7,7 @@ import edu.uniquindio.stayhub.api.dto.comment.CommentUpdateDTO;
 import edu.uniquindio.stayhub.api.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -167,5 +168,14 @@ public class CommentController {
 
         CommentResponseDTO commented = commentService.replyToComment(id, replyDTO, authentication.getName());
         return ResponseEntity.status(201).body(commented);
+    }
+
+    @Operation(summary = "Ping endpoint for health checks", description = "Returns PONG if the controller is alive")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Controller is alive", content = @Content(mediaType = "text/plain"))
+    })
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("PONG");
     }
 }
