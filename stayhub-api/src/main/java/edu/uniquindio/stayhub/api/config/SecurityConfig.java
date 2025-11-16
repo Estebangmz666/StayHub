@@ -154,6 +154,16 @@ public class SecurityConfig {
                                         "POST", "/api/v1/comments/{id}/reply"
                                 ).authenticated()
 
+                                // ==== TEST AND HEALTH PUBLIC ENDPOINTS ====
+                                .requestMatchers(
+                                        "/api/v1/test/**",
+                                        "/api/v1/users/ping",
+                                        "/api/v1/accommodations/ping",
+                                        "/api/v1/reservations/ping",
+                                        "/api/v1/comments/ping",
+                                        "/api/v1/amenities/ping"
+                                ).permitAll()
+
 
                                 // ==== DEFAULT RULE ====
                                 .anyRequest().authenticated()
