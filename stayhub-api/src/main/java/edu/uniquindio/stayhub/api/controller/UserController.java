@@ -186,4 +186,13 @@ public class UserController {
         LOGGER.debug("Info fetched successfully for user ID: {}", id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "Ping endpoint for health checks", description = "Returns PONG if the controller is alive")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Controller is alive", content = @Content(mediaType = "text/plain"))
+    })
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("PONG");
+    }
 }

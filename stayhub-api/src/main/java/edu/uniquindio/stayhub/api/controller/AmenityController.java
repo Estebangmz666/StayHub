@@ -6,6 +6,9 @@ import edu.uniquindio.stayhub.api.dto.amenity.AmenityUpdateDTO;
 import edu.uniquindio.stayhub.api.service.AmenityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -84,5 +87,14 @@ public class AmenityController {
         LOGGER.info("Request to get amenity with ID: {}", id);
         AmenityResponseDTO amenity = amenityService.getAmenityById(id);
         return new ResponseEntity<>(amenity, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Ping endpoint for health checks", description = "Returns PONG if the controller is alive")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Controller is alive", content = @Content(mediaType = "text/plain"))
+    })
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("PONG");
     }
 }
