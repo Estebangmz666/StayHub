@@ -7,6 +7,8 @@ import {DashboardComponent} from './shared/pages/dashboard/dashboard.component';
 import {authGuard} from './guards/auth';
 import {AccommodationsListComponent} from './shared/pages/accommodation-list/accommodation-list.component';
 import {AccommodationDetailComponent} from './shared/pages/accommodation-detail/accommodation-detail.component';
+import {MyAccommodationsComponent} from './shared/pages/my-accommodations/my-accommodations.component';
+import {AccommodationFormComponent} from './shared/pages/accommodation-form/accommodation-form.component';
 
 export const routes: Routes = [
   {
@@ -41,6 +43,16 @@ export const routes: Routes = [
   {
     path: 'accommodations/:id',
     component: AccommodationDetailComponent
+  },
+  {
+    path: 'accommodations/:id/edit',
+    component: AccommodationFormComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'my-accommodations',
+    component: MyAccommodationsComponent,
+    canActivate: [authGuard]
   },
   {
     path: '**',

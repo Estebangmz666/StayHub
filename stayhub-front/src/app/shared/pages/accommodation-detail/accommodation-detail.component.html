@@ -171,9 +171,90 @@
               <span class="price-label">/ noche</span>
             </div>
 
-            <!-- Botón de reserva -->
-            <button class="btn-reserve" (click)="makeReservation()">
-              Reservar ahora
+            <!-- Formulario de reserva -->
+            <div class="reservation-form">
+
+              <!-- Fechas -->
+              <div class="date-grid">
+                <!-- Check-in -->
+                <div class="date-group">
+                  <label class="date-label">Entrada</label>
+                  <input
+                    type="date"
+                    [(ngModel)]="reservationForm.checkInDate"
+                    [min]="reservationUtils.getMinCheckInDate()"
+                    (change)="onCheckInChange()"
+                    class="date-input"
+                    [class.error]="reservationErrors.checkInDate"
+                  />
+                  <input
+                    type="time"
+                    [(ngModel)]="reservationForm.checkInTime"
+                    class="time-input"
+                  />
+                  <span *ngIf="reservationErrors.checkInDate" class="error-text-small">
+            {{ reservationErrors.checkInDate }}
+          </span>
+                </div>
+
+                <!-- Check-out -->
+                <div class="date-group">
+                  <label class="date-label">Salida</label>
+                  <input
+                    type="date"
+                    [(ngModel)]="reservationForm.checkOutDate"
+                    [min]="reservationUtils.getMinCheckOutDate(reservationForm.checkInDate)"
+                    class="date-input"
+                    [class.error]="reservationErrors.checkOutDate"
+                  />
+                  <input
+                    type="time"
+                    [(ngModel)]="reservationForm.checkOutTime"
+                    class="time-input"
+                  />
+                  <span *ngIf="reservationErrors.checkOutDate" class="error-text-small">
+            {{ reservationErrors.checkOutDate }}
+          </span>
+                </div>
+              </div>
+
+              <!-- Número de huéspedes -->
+              <div class="guests-group">
+                <label class="date-label">Huéspedes</label>
+                <input
+                  type="number"
+                  [(ngModel)]="reservationForm.numberOfGuests"
+                  [min]="1"
+                  [max]="accommodation.capacity"
+                  class="guests-input"
+                  [class.error]="reservationErrors.numberOfGuests"
+                />
+                <span *ngIf="reservationErrors.numberOfGuests" class="error-text-small">
+          {{ reservationErrors.numberOfGuests }}
+        </span>
+              </div>
+
+              <!-- Resumen -->
+              <div *ngIf="numberOfNights > 0" class="price-breakdown">
+                <div class="breakdown-row">
+                  <span>{{ utils.formatPrice(accommodation.pricePerNight) }} x {{ numberOfNights }} {{ numberOfNights === 1 ? 'noche' : 'noches' }}</span>
+                  <span>{{ utils.formatPrice(accommodation.pricePerNight * numberOfNights) }}</span>
+                </div>
+                <div class="breakdown-total">
+                  <span>Total</span>
+                  <span class="total-amount">{{ utils.formatPrice(calculatedTotalPrice) }}</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Botón de reservar -->
+            <button
+              class="btn-reserve"
+              (click)="makeReservation()"
+              [disabled]="isSubmittingReservation"
+            >
+              {{ isSubmittingReservation ? 'Reservando...' : 'Reservar ahora' }}
             </button>
 
             <!-- Contactar anfitrión -->
@@ -191,7 +272,7 @@
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                 </svg>
-                Cancelación gratuita
+                No se te cobrará todavía
               </p>
               <p>
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">

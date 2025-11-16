@@ -1,0 +1,18 @@
+export const RESERVATION_CONSTANTS = {
+  DEFAULT_CHECK_IN_TIME: '15:00',
+  DEFAULT_CHECK_OUT_TIME: '11:00',
+  MIN_GUESTS: 1,
+  MAX_RESERVATION_DAYS: 30,
+
+  STATUS_COLORS: {
+    PENDING: '#F59E0B',
+    CONFIRMED: '#10B981',
+    CANCELLED: '#EF4444'
+  },
+
+  STATUS_LABELS: {
+    PENDING: 'Pendiente',
+    CONFIRMED: 'Confirmada',
+    CANCELLED: 'Cancelada'
+  }
+};

@@ -1,0 +1,265 @@
+<div class="form-page">
+
+  <!-- Loading inicial -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- Error inicial -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="cancel()">Volver</button>
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="!isLoading && !error" class="form-container">
+
+    <!-- Header -->
+    <div class="form-header">
+      <h1 class="form-title">{{ pageTitle }}</h1>
+      <button class="btn-cancel" (click)="cancel()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Cancelar
+      </button>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-content">
+
+      <!-- Sección: Información Básica -->
+      <div class="form-section">
+        <h2 class="section-title">Información Básica</h2>
+
+        <!-- Título -->
+        <div class="form-group">
+          <label class="form-label">Título <span class="required">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="formData.title"
+            placeholder="Ej: Apartamento moderno en el centro"
+            class="form-input"
+            [class.error]="errors.title"
+            maxlength="100"
+          />
+          <span *ngIf="errors.title" class="error-text">{{ errors.title }}</span>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label class="form-label">Descripción <span class="required">*</span></label>
+          <textarea
+            [(ngModel)]="formData.description"
+            placeholder="Describe tu propiedad detalladamente..."
+            class="form-textarea"
+            [class.error]="errors.description"
+            rows="5"
+            maxlength="1000"
+          ></textarea>
+          <div class="char-count">{{ formData.description?.length || 0 }} / 1000</div>
+          <span *ngIf="errors.description" class="error-text">{{ errors.description }}</span>
+        </div>
+
+        <!-- Capacidad -->
+        <div class="form-group">
+          <label class="form-label">Capacidad (huéspedes) <span class="required">*</span></label>
+          <input
+            type="number"
+            [(ngModel)]="formData.capacity"
+            min="1"
+            max="20"
+            class="form-input"
+            [class.error]="errors.capacity"
+          />
+          <span *ngIf="errors.capacity" class="error-text">{{ errors.capacity }}</span>
+        </div>
+      </div>
+
+      <!-- Sección: Ubicación -->
+      <div class="form-section">
+        <h2 class="section-title">Ubicación</h2>
+
+        <!-- Ciudad -->
+        <div class="form-group">
+          <label class="form-label">Ciudad <span class="required">*</span></label>
+          <select
+            [(ngModel)]="formData.city"
+            class="form-select"
+            [class.error]="errors.city"
+          >
+            <option value="">Selecciona una ciudad</option>
+            <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+          </select>
+          <span *ngIf="errors.city" class="error-text">{{ errors.city }}</span>
+        </div>
+
+        <!-- Descripción de ubicación -->
+        <div class="form-group">
+          <label class="form-label">Descripción de la ubicación <span class="required">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="formData.locationDescription"
+            placeholder="Ej: Cerca del Parque Lleras, sector El Poblado"
+            class="form-input"
+            [class.error]="errors.locationDescription"
+          />
+          <span *ngIf="errors.locationDescription" class="error-text">{{ errors.locationDescription }}</span>
+        </div>
+
+        <!-- Coordenadas -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Latitud <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="formData.latitude"
+              step="0.000001"
+              placeholder="Ej: 6.2442"
+              class="form-input"
+              [class.error]="errors.latitude"
+            />
+            <span *ngIf="errors.latitude" class="error-text">{{ errors.latitude }}</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Longitud <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="formData.longitude"
+              step="0.000001"
+              placeholder="Ej: -75.5668"
+              class="form-input"
+              [class.error]="errors.longitude"
+            />
+            <span *ngIf="errors.longitude" class="error-text">{{ errors.longitude }}</span>
+          </div>
+        </div>
+
+        <p class="helper-text">
+          💡 Tip: Puedes obtener las coordenadas en Google Maps haciendo click derecho en el mapa
+        </p>
+      </div>
+
+      <!-- Sección: Precio -->
+      <div class="form-section">
+        <h2 class="section-title">Precio</h2>
+
+        <div class="form-group">
+          <label class="form-label">Precio por noche (COP) <span class="required">*</span></label>
+          <input
+            type="number"
+            [(ngModel)]="formData.pricePerNight"
+            min="0"
+            step="1000"
+            placeholder="Ej: 150000"
+            class="form-input"
+            [class.error]="errors.pricePerNight"
+          />
+          <span *ngIf="errors.pricePerNight" class="error-text">{{ errors.pricePerNight }}</span>
+        </div>
+      </div>
+
+      <!-- Sección: Imágenes -->
+      <div class="form-section">
+        <h2 class="section-title">Imágenes</h2>
+
+        <!-- Imagen principal -->
+        <div class="form-group">
+          <label class="form-label">Imagen principal (URL) <span class="required">*</span></label>
+          <input
+            type="url"
+            [(ngModel)]="formData.mainImage"
+            placeholder="https://ejemplo.com/imagen.jpg"
+            class="form-input"
+            [class.error]="errors.mainImage"
+          />
+          <span *ngIf="errors.mainImage" class="error-text">{{ errors.mainImage }}</span>
+
+          <!-- Preview -->
+          <div *ngIf="formData.mainImage && isValidUrl(formData.mainImage)" class="image-preview">
+            <img [src]="formData.mainImage" alt="Preview" />
+          </div>
+        </div>
+
+        <!-- Imágenes adicionales -->
+        <div class="form-group">
+          <label class="form-label">Imágenes adicionales (opcional)</label>
+
+          <!-- Lista de imágenes -->
+          <div *ngIf="formData.images.length > 0" class="images-list">
+            <div *ngFor="let image of formData.images; let i = index" class="image-item">
+              <img [src]="image" alt="Imagen {{ i + 1 }}" />
+              <button type="button" class="btn-remove-image" (click)="removeImage(i)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Agregar nueva imagen -->
+          <div class="add-image-row">
+            <input
+              type="url"
+              [(ngModel)]="newImageUrl"
+              placeholder="https://ejemplo.com/imagen.jpg"
+              class="form-input"
+            />
+            <button type="button" class="btn-add-image" (click)="addImage()">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Agregar
+            </button>
+          </div>
+          <p class="helper-text">Máximo {{ ACCOMMODATION_CONSTANTS.MAX_IMAGES }} imágenes</p>
+        </div>
+      </div>
+
+      <!-- Sección: Amenidades -->
+      <div class="form-section">
+        <h2 class="section-title">Amenidades</h2>
+
+        <div class="amenities-grid">
+          <label
+            *ngFor="let amenity of availableAmenities"
+            class="amenity-checkbox"
+            [class.selected]="isAmenitySelected(amenity.id)"
+          >
+            <input
+              type="checkbox"
+              [checked]="isAmenitySelected(amenity.id)"
+              (change)="toggleAmenity(amenity.id)"
+            />
+            <span class="amenity-icon">{{ amenity.icon }}</span>
+            <span class="amenity-name">{{ amenity.name }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="cancel()"
+          [disabled]="isSubmitting"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn-submit"
+          (click)="handleSubmit()"
+          [disabled]="isSubmitting"
+        >
+          {{ submitButtonText }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

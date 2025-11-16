@@ -3,18 +3,19 @@ import {environmentDev} from '../../environments/environment.dev';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {UserRegistrationDTO, UserResponseDTO} from '../models/register';
 import {catchError, Observable, tap, throwError} from 'rxjs';
+import {environmentProd} from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RegisterService {
 
-  private readonly baseUrl = `${environmentDev.apiUrl}${environmentDev.apiVersion}`;
+  private readonly baseUrl = `${environmentProd.apiUrl}${environmentProd.apiVersion}/users`;
 
   constructor(private http: HttpClient) {}
 
   register(userData: UserRegistrationDTO): Observable<UserResponseDTO> {
-    return this.http.post<UserResponseDTO>(`${this.baseUrl}/users/register`, userData)
+    return this.http.post<UserResponseDTO>(`${this.baseUrl}/register`, userData)
       .pipe(
         tap(response => {
           console.log('Registro exitoso:', response);

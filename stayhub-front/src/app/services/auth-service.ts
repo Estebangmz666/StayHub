@@ -4,13 +4,14 @@ import {BehaviorSubject, catchError, Observable, tap, throwError} from 'rxjs';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {LoginRequest, LoginResponse} from '../models/LoginRequest';
 import {JwtUtils} from '../utils/JwtUtils';
+import {environmentProd} from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private readonly baseUrl = new URL(environmentDev.apiVersion, environmentDev.apiUrl).toString();
+  private readonly baseUrl = `${environmentProd.apiUrl}${environmentProd.apiVersion}/users`;
 
   private readonly isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
@@ -21,7 +22,7 @@ export class AuthService {
   login(email: string, password: string): Observable<LoginResponse> {
     const loginData: LoginRequest = { email, password };
 
-    return this.http.post<LoginResponse>(`${this.baseUrl}/users/login`, loginData)
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, loginData)
       .pipe(
         tap(response => {
           if (response.token) {

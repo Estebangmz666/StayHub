@@ -3,8 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { JwtUtils } from '../utils/JwtUtils';
+import {environmentProd} from '../../environments/environment.prod';
 
-// Interface para el usuario (basada en tu UserResponseDTO)
 export interface User {
   id: number;
   email: string;
@@ -21,15 +21,11 @@ export interface User {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8080/api/v1';
+  private apiUrl = `${environmentProd.apiUrl}${environmentProd.apiVersion}/users`;
 
   constructor(private http: HttpClient) {}
-
-  // Obtiene el usuario actual (el que está logueado)
   getCurrentUser(): Observable<User> {
-    // Obtiene el ID del token JWT
     const userId = JwtUtils.getUserIdFromToken();
-
     if (!userId) {
       return throwError(() => new Error('No se pudo obtener el ID del usuario del token'));
     }
@@ -37,9 +33,8 @@ export class UserService {
     return this.getUserById(userId);
   }
 
-  // Obtiene un usuario por ID
   getUserById(userId: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/${userId}`)
+    return this.http.get<User>(`${this.apiUrl}/${userId}`)
       .pipe(
         tap(user => {
           console.log('Usuario obtenido:', user);
@@ -49,7 +44,7 @@ export class UserService {
   }
 
   updateUser(userId: string, userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/users/${userId}`, userData)
+    return this.http.put<User>(`${this.apiUrl}/${userId}`, userData)
       .pipe(
         tap(user => {
           console.log('Usuario actualizado:', user);

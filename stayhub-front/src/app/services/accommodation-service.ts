@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import {
@@ -9,16 +9,29 @@ import {
   SearchResponseDTO,
   AccommodationFilters
 } from '../models/accommodation';
+import {environmentProd} from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccommodationService {
-  private apiUrl = 'http://localhost:8080/api/v1/accommodations';
+  private readonly apiUrl = `${environmentProd.apiUrl}${environmentProd.apiVersion}/accommodations`;
 
   constructor(private http: HttpClient) {}
 
-  // Lista todas las propiedades (paginado)
+  getMyAccommodations(username: string, page: number = 0, size: number = 10): Observable<SearchResponseDTO<AccommodationResponseDTO>> {
+    const headers = new HttpHeaders({ 'X-Username': username });
+    const url = `${this.apiUrl}/my-accommodations?page=${page}&size=${size}`;
+
+    return this.http.get<SearchResponseDTO<AccommodationResponseDTO>>(url, { headers })
+      .pipe(
+        tap(response => {
+          console.log('Mis propiedades obtenidas:', response);
+        }),
+        catchError(this.handleError)
+      );
+  }
+
   listAccommodations(page: number = 0, size: number = 10): Observable<SearchResponseDTO<AccommodationResponseDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
@@ -33,7 +46,6 @@ export class AccommodationService {
       );
   }
 
-  // Busca propiedades con filtros
   searchAccommodations(filters: AccommodationFilters): Observable<SearchResponseDTO<AccommodationResponseDTO>> {
     let params = new HttpParams()
       .set('page', (filters.page || 0).toString())
@@ -75,10 +87,8 @@ export class AccommodationService {
       );
   }
 
-  // Crea una nueva propiedad (solo HOST)
   createAccommodation(data: AccommodationRequestDTO, username: string): Observable<AccommodationResponseDTO> {
     const headers = { 'X-Username': username };
-
     return this.http.post<AccommodationResponseDTO>(this.apiUrl, data, { headers })
       .pipe(
         tap(accommodation => {
@@ -88,10 +98,8 @@ export class AccommodationService {
       );
   }
 
-  // Actualiza una propiedad (solo HOST dueño)
   updateAccommodation(id: number, data: AccommodationUpdateDTO, username: string): Observable<AccommodationResponseDTO> {
     const headers = { 'X-Username': username };
-
     return this.http.put<AccommodationResponseDTO>(`${this.apiUrl}/${id}`, data, { headers })
       .pipe(
         tap(accommodation => {
@@ -101,10 +109,8 @@ export class AccommodationService {
       );
   }
 
-  // Elimina una propiedad (soft delete, solo HOST dueño)
   deleteAccommodation(id: number, username: string): Observable<{ message: string }> {
     const headers = { 'X-Username': username };
-
     return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`, { headers })
       .pipe(
         tap(response => {
@@ -114,15 +120,12 @@ export class AccommodationService {
       );
   }
 
-  // Maneja errores HTTP
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ocurrió un error inesperado';
 
     if (error.error instanceof ErrorEvent) {
-      // Error del cliente
       errorMessage = `Error de red: ${error.error.message}`;
     } else {
-      // Error del servidor
       switch (error.status) {
         case 204:
           errorMessage = 'No se encontraron propiedades';
@@ -146,7 +149,6 @@ export class AccommodationService {
           errorMessage = error.error?.message || `Error ${error.status}`;
       }
     }
-
     console.error('Error:', error);
     return throwError(() => new Error(errorMessage));
   }
