@@ -104,6 +104,8 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(requestDTO.getEmail()).orElseThrow(()
                 -> new UserNotFoundException("Usuario no encontrado"));
 
+        String firstName = user.getName().split(" ")[0];
+
         Long activeTokens = passwordResetTokenRepository.countByUserAndUsedFalse(user);
         if (activeTokens >= 3) {
             LOGGER.warn("Too many active password reset tokens for user: {}", user.getEmail());
@@ -121,9 +123,8 @@ public class UserService implements UserDetailsService {
         resetToken.setUsed(false);
         passwordResetTokenRepository.save(resetToken);
         LOGGER.debug("Password reset token generated for user: {}", user.getEmail());
-
         try {
-            emailService.sendPasswordResetEmail(user.getEmail(), token);
+            emailService.sendPasswordResetEmail(user.getEmail(), token, firstName);
             LOGGER.info("Password reset email sent to: {}", user.getEmail());
         } catch (Exception e) {
             LOGGER.error("Failed to send password reset email to: {}", user.getEmail(), e);

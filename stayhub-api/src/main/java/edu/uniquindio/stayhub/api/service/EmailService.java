@@ -67,7 +67,7 @@ public class EmailService {
      * @param token The password reset token.
      */
     @Async
-    public void sendPasswordResetEmail(String email, String token) {
+    public void sendPasswordResetEmail(String email, String token, String firstName) {
         String link = frontendUrl + "/reset-password?token=" + token;
 
         // Preparar variables para la plantilla
@@ -75,6 +75,7 @@ public class EmailService {
         variables.put("resetLink", link);
         variables.put("expirationMinutes", 15);
         variables.put("token", token);
+        variables.put("firstName", firstName);
 
         sendEmailWithTemplate(
                 email,
